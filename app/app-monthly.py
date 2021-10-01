@@ -3,10 +3,8 @@ import pandas as pd
 from scipy.stats import norm, kurtosis
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.datasets import load_boston
-from sklearn import metrics
+import pyfolio as pf
+
 
 # set the 'Date' column as the index
 monthly_data = pd.read_csv("../data/hf_monthly.csv", parse_dates=["Date"], index_col="Date")
@@ -43,6 +41,12 @@ def performance_statistics(data_frame):
     # tail_ratio = 
     # treynor_ratio = 
 
+    # simple_tear_sheet = pf.create_simple_tear_sheet(df_monthly[cols])
+    # full_tear_sheet = pf.create_full_tear_sheet(df_monthly[cols])
+    # print(f"simple_tear_sheet:\n{simple_tear_sheet}")
+    # print(f"full_tear_sheet:\n{full_tear_sheet}")
+    ts = pf.create_returns_tear_sheet(df_monthly['Tim_Trend_2'])
+    print(f"ts:\n{ts}")
 
     # # print(f"information_ratio:\n{information_ratio}")
     # # print(f"----")
