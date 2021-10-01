@@ -1,0 +1,30 @@
+Activate conda:
+echo ". ~/anaconda3/etc/profile.d/conda.sh" >> ~/.bashrc
+conda activate
+
+-------------------------------------------------------------------------
+
+Flask env:
+To create env:
+conda create -n hfqmenv flask
+
+-------------------------------------------------------------------------
+
+To activate env:
+conda activate hfqmenv
+
+-------------------------------------------------------------------------
+
+To run a Python file:
+python fileName.py
+
+-------------------------------------------------------------------------
+
+To Clone the Repo:
+git clone url_link
+
+To Add & Commit Code:
+git status
+git add .
+git commit -m "COMMENT GOES HERE"
+git push OR git push origin master
