@@ -4,7 +4,6 @@ from scipy.stats import norm, kurtosis
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime as dt
-import csv
 
 class PerformanceStatistics:
     def __init__(self):
