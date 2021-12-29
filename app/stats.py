@@ -18,14 +18,20 @@ class Stats:
 
     def average_return(self):
         rows = []
+        df = pd.DataFrame()
+
         for i in self.file_list:
             column = i.columns[0]
             avg_return = i[column].expanding().mean()
             rows.append(avg_return)
         
-        # print(f"rows:\n{rows}")
-        df = pd.DataFrame(rows, columns=['AverageReturn'])
-        print(f"df:\n{df}")
+        for row in rows:
+            print(f"row:\n{row}")
+            print("---------")
+            print(f"type(row):\n{type(row)}")
+            print("---------")
+        #     df['AverageReturn'] = row
+        # print(f"df:\n{df}")
         # return df
 
     # def median_return(self):
