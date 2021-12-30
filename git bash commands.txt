@@ -14,27 +14,3 @@ To activate env:
 conda activate hfqmenv
 
 -------------------------------------------------------------------------
-
-To run a Python file:
-python fileName.py
-
--------------------------------------------------------------------------
-
-To Clone the Repo:
-git clone url_link
-
-To Add & Commit Code:
-git status
-git add .
-git commit -m "COMMENT GOES HERE"
-git push OR git push origin master
-
--------------------------------------------------------------------------
-
-Possible PyFolio Issues:
-https://stackoverflow.com/questions/65418898/pyfolio-attributeerror-numpy-int64-object-has-no-attribute-to-pydatetime
-# remove your installed pyfolio library
-pip uninstall pyfolio
-
-# Install it again from its github repo
-pip install git+https://github.com/quantopian/pyfolio
