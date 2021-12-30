@@ -11,6 +11,7 @@ class Stats:
     def __init__(self):
         self.directory = os.listdir(f"../data-files")
         self.file_list = Directory(self.directory).files()
+        self.rf = 0.02 / 12
 
     def average_return(self):
         db = []
@@ -158,4 +159,21 @@ class Stats:
             db.append(df)
         return db
 
-# gain to pain ratio - line 50
+# gain to pain ratio
+# information_ratio
+    def sharpe_ratio(self):
+        db = []
+
+        st_devs = self.standard_devation()
+        avg_returns = self.average_return()
+
+        for (avg_return, st_dev) in zip(avg_returns, st_devs):
+            rp = avg_return['AvgReturn']
+            st_dev_ = st_dev['StDev']
+            df = pd.merge_ordered(rp, st_dev_, on='Date')
+            # Sharpe Ratio = (rp - rf) / st_dev
+            sharpe = (df['AvgReturn'] - self.rf) / df['StDev']
+            df['Sharpe'] = sharpe
+            df['SharpeAnnualized'] = sharpe * np.sqrt(12)
+            db.append(df)
+        return db

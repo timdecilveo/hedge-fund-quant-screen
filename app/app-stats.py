@@ -16,4 +16,6 @@ average_return_over_max_dd = Stats().average_return_over_max_dd()
 median_return_over_max_dd = Stats().median_return_over_max_dd()
 cagr_over_max_dd = Stats().cagr_over_max_dd()
 
-# print(cagr_over_st_dev)
+sharpe_ratio = Stats().sharpe_ratio()
+
+print(sharpe_ratio)
