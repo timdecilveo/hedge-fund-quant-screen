@@ -5,6 +5,8 @@ median_return = Stats().median_return()
 nmaximum_return = Stats().nmaximum_return()
 minimum_return = Stats().minimum_return()
 standard_devation = Stats().standard_devation()
+skew = Stats().skew()
+
 cagr = Stats().cagr()
 max_drawdown = Stats().max_drawdown()
 
@@ -18,5 +20,6 @@ cagr_over_max_dd = Stats().cagr_over_max_dd()
 
 sharpe_ratio = Stats().sharpe_ratio()
 sortino_ratio = Stats().sortino_ratio()
+calmar_ratio = Stats().calmar_ratio()
 
-print(sortino_ratio)
+print(skew)

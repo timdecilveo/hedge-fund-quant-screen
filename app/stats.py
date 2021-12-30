@@ -66,7 +66,23 @@ class Stats:
             i['DownsideDev'] = downside_deviation_
             db.append(i)
         return db
-    
+
+    def skew(self):
+        db = []
+        for i in self.file_list:
+            file_name = i.columns[0]
+            skew_ = i[file_name].expanding().skew(axis=0)
+            i['Skew'] = skew_
+            db.append(i)
+        return db
+
+
+
+
+
+
+
+
     def cagr(self):
         db = []
         for i in self.file_list:
@@ -200,5 +216,21 @@ class Stats:
             sortino = (df['AvgReturn'] - self.rf) / df['DownsideDev']
             df['Sortino'] = sortino
             df['SortinoAnnualized'] = sortino * np.sqrt(12)
+            db.append(df)
+        return db
+
+    def calmar_ratio(self):
+        db = []
+        max_dds = self.max_drawdown()
+        avg_returns = self.average_return()
+
+        for (avg_return, max_dd) in zip(avg_returns, max_dds):
+            rp = avg_return['AvgReturn']
+            max_dd_ = max_dd['MaxDD']
+            df = pd.merge_ordered(rp, max_dd_, on='Date')
+            # Calmar Ratio = (rp - rf) / max_dd
+            calmar = (df['AvgReturn'] - self.rf) / abs(df['MaxDD'])
+            df['Calmar'] = calmar
+            df['CalmarAnnualized'] = calmar * np.sqrt(12)
             db.append(df)
         return db
