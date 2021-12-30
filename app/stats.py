@@ -161,9 +161,9 @@ class Stats:
 
 # gain to pain ratio
 # information_ratio
+
     def sharpe_ratio(self):
         db = []
-
         st_devs = self.standard_devation()
         avg_returns = self.average_return()
 
