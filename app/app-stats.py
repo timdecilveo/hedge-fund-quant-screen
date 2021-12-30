@@ -17,5 +17,6 @@ median_return_over_max_dd = Stats().median_return_over_max_dd()
 cagr_over_max_dd = Stats().cagr_over_max_dd()
 
 sharpe_ratio = Stats().sharpe_ratio()
+sortino_ratio = Stats().sortino_ratio()
 
-print(sharpe_ratio)
+print(sortino_ratio)

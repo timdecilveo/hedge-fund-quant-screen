@@ -57,6 +57,15 @@ class Stats:
             i['StDev'] = standard_deviation_
             db.append(i)
         return db
+
+    def downside_devation(self):
+        db = []
+        for i in self.file_list:
+            file_name = i.columns[0]
+            downside_deviation_ = i[i[file_name] < 0].expanding().std() # deviations of only the negative returns
+            i['DownsideDev'] = downside_deviation_
+            db.append(i)
+        return db
     
     def cagr(self):
         db = []
@@ -175,5 +184,21 @@ class Stats:
             sharpe = (df['AvgReturn'] - self.rf) / df['StDev']
             df['Sharpe'] = sharpe
             df['SharpeAnnualized'] = sharpe * np.sqrt(12)
+            db.append(df)
+        return db
+
+    def sortino_ratio(self):
+        db = []
+        downside_deviations = self.downside_devation()
+        avg_returns = self.average_return()
+
+        for (avg_return, downside_deviation) in zip(avg_returns, downside_deviations):
+            rp = avg_return['AvgReturn']
+            downside_deviation_ = downside_deviation['DownsideDev']
+            df = pd.merge_ordered(rp, downside_deviation_, on='Date')
+            # Sortino Ratio = (rp - rf) / downside_deviation
+            sortino = (df['AvgReturn'] - self.rf) / df['DownsideDev']
+            df['Sortino'] = sortino
+            df['SortinoAnnualized'] = sortino * np.sqrt(12)
             db.append(df)
         return db
