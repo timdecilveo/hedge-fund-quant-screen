@@ -13,224 +13,192 @@ class Stats:
         self.file_list = Directory(self.directory).files()
         self.rf = 0.02 / 12
 
-    def average_return(self):
+    def statistics(self):
         db = []
-        for i in self.file_list:
-            file_name = i.columns[0]
-            average_return_ = i[file_name].expanding().mean()
-            i['AvgReturn'] = average_return_
-            db.append(i)
-        return db
 
-    def median_return(self):
-        db = []
-        for i in self.file_list:
-            file_name = i.columns[0]
-            median_reutrn_ = i[file_name].expanding().median()
-            i['MedReturn'] = median_reutrn_
-            db.append(i)
-        return db
-
-    def nmaximum_return(self):
-        db = []
-        for i in self.file_list:
-            file_name = i.columns[0]
-            maximum_return_ = i[file_name].expanding().max()
-            i['MaxReturn'] = maximum_return_
-            db.append(i)
-        return db
-
-    def minimum_return(self):
-        db = []
-        for i in self.file_list:
-            file_name = i.columns[0]
-            minimum_return_ = i[file_name].expanding().min()
-            i['MinReturn'] = minimum_return_
-            db.append(i)
-        return db
-
-    def standard_devation(self):
-        db = []
-        for i in self.file_list:
-            file_name = i.columns[0]
-            standard_deviation_ = i[file_name].expanding().std()
-            i['StDev'] = standard_deviation_
-            db.append(i)
-        return db
-
-    def downside_devation(self):
-        db = []
-        for i in self.file_list:
-            file_name = i.columns[0]
-            downside_deviation_ = i[i[file_name] < 0].expanding().std() # deviations of only the negative returns
-            i['DownsideDev'] = downside_deviation_
-            db.append(i)
-        return db
-
-    def skew(self):
-        db = []
-        for i in self.file_list:
-            file_name = i.columns[0]
-            skew_ = i[file_name].expanding().skew(axis=0)
-            i['Skew'] = skew_
-            db.append(i)
-        return db
-
-
-
-
-
-
-
-
-    def cagr(self):
-        db = []
         for i in self.file_list:
             file_name = i.columns[0]
             dates = i[file_name].index
             start_date = dates[0]
             end_date = dates[-1] #need to fix this so it's the rolling date
+
+            monthly_return = i[file_name]
+            average_return = monthly_return.expanding().mean()
+            median_reutrn = monthly_return.expanding().median()
+            maximum_return = monthly_return.expanding().max()
+            minimum_return = monthly_return.expanding().min()
+            standard_deviation = monthly_return.expanding().std()
+
+            # downside deviation of monthly percentage returns
+            downside_deviation = i[monthly_return < 0].expanding().std() # deviations of only the negative returns
+            skew = monthly_return.expanding().skew(axis=0)
+            kurtosis = monthly_return.expanding().kurt(axis=0)
+            excess_kurtosis = kurtosis - 3
+            kurtosis_times_skew_ = kurtosis * skew
+            excess_kurtosis_times_skew_ = excess_kurtosis * skew
+
             time_delta_days = (end_date - start_date).days
             years = time_delta_days / 365
-
-            compounded_return = (i[file_name] + 1).cumprod()
+            compounded_return = (monthly_return + 1).cumprod()
             cagr = ((compounded_return) ** (1 / years)) - 1
-            i['CompoundedReturn'] = compounded_return
-            i['CAGR'] = cagr
-            db.append(i)
-        return db
 
-    def max_drawdown(self):
-        db = []
-        for i in self.file_list:
-            file_name = i.columns[0]
-            compounded_return = (i[file_name] + 1).cumprod()
             peak = compounded_return.expanding(min_periods=1).max()
             drawdown = (compounded_return / peak) - 1
             max_drawdown = drawdown.min()
+            markowitz_return_function = average_return / standard_deviation
+
+            '''
+            Sharpe Ratio:
+            sharpe ratio = (rp - rf) / standard deviation
+                rp = average_return
+                rf = self.rf
+                standard deviation = standard_deviation
+            '''
+            sharpe = (average_return - self.rf) / standard_deviation
+
+            '''
+            Sortino Ratio:
+            sortino ratio = (rp - rf) / downside deviation
+                rp = average_return
+                rf = self.rf
+                downside deviation = downside_deviation
+            '''
+            sortino = (average_return - self.rf) / downside_deviation
+
+            '''
+            Calmar Ratio:
+            calmar ratio = (rp - rf) / maximum drawdown
+                rp = average_return
+                rf = self.rf
+                maximum drawdown = max_drawdown
+            '''
+            calmar = (average_return - self.rf) / abs(max_drawdown)
+
+            '''
+            Parametric/Gaussian VaR
+            gaussian var = 
+            '''
+            z = norm.ppf(0.05)
+            gaussian_var = -(average_return + z * monthly_return.std(ddof=0))
+
+            '''
+            Modified Cornish Fisher VaR
+            cornish fisher var = 
+            '''
+            z = (z + (z**2 - 1) * skew / 6 + (z**3 - 3 * z) * (kurtosis - 3) / 24 - (2 * z**3 - 5 * z) * (skew**2) / 36)
+            modified_cornish_fisher_var = -(average_return + z * monthly_return.std(ddof=0))
+
+            '''
+            Winning Months vs. Losing Months
+            '''
+            winning = monthly_return.gt(0)
+            losing = monthly_return.lt(0)
+            flat = monthly_return.eq(0)
+
+            # Winning Months
+            winning_average_return = i[winning].expanding().mean()
+            winning_median_return = i[winning].expanding().median()
+            winning_max_return = i[winning].expanding().max()
+            winning_min_return = i[winning].expanding().min()
+            winning_st_dev = i[winning].expanding().std()
+            winning_num_periods = i[winning].expanding().count()
+
+            # Losing Months
+            losing_average_return = i[losing].expanding().mean()
+            losing_median_return = i[losing].expanding().median()
+            losing_max_return = i[losing].expanding().max()
+            losing_min_return = i[losing].expanding().min()
+            losing_st_dev = i[losing].expanding().std()
+            losing_num_periods = i[losing].expanding().count()
+
+            # Total Months
+            total_num_periods = monthly_return.expanding().count()
+
+            # Winning vs. Losing Months Calculations
+            # Winning Months Calcs
+            df_winning_periods_percentage = pd.merge_ordered(winning_num_periods, total_num_periods, on='Date', suffixes=('_win', '_total'), fill_method='ffill')
+            index = df_winning_periods_percentage.columns[0]
+            win_col = df_winning_periods_percentage.columns[1]
+            total_col = df_winning_periods_percentage.columns[2]
+            df_winning_periods_percentage.set_index(index, inplace=True)
+            df_winning_periods_percentage['WinningPerc (%)'] = df_winning_periods_percentage[win_col] / df_winning_periods_percentage[total_col]
+            winning_periods_percentage = df_winning_periods_percentage['WinningPerc (%)']
+
+            # Losing Months Calcs
+            df_losing_periods_percentage = pd.merge_ordered(losing_num_periods, total_num_periods, on='Date', suffixes=('_lose', '_total'), fill_method='ffill')
+            index = df_losing_periods_percentage.columns[0]
+            los_col = df_losing_periods_percentage.columns[1]
+            total_col = df_losing_periods_percentage.columns[2]
+            df_losing_periods_percentage.set_index(index, inplace=True)
+            df_losing_periods_percentage['LosingPerc (%)'] = df_losing_periods_percentage[los_col] / df_losing_periods_percentage[total_col]
+            losing_periods_percentage = df_losing_periods_percentage['LosingPerc (%)']
+
+
+            win_loss_ratio = winning_num_periods / losing_num_periods
+            expectancy = (winning_median_return * winning_num_periods) + (losing_median_return * losing_num_periods)
+            expectancy_ratio = (winning_median_return * winning_num_periods) / abs((losing_median_return * losing_num_periods))
+
+            # ####################################
+            i['MonthlyReturn'] = monthly_return
+            i['AvgReturn'] = average_return
+            i['MedianReturn'] = median_reutrn
+            i['MaxReturn'] = maximum_return
+            i['MinReturn'] = minimum_return
+            i['StDev'] = standard_deviation
+            i['DownsideDev'] = downside_deviation
+            i['Skew'] = skew
+            i['Kurtosis'] = kurtosis
+            i['ExcessKurtosis'] = excess_kurtosis
+            i['Kurt*Skew'] = kurtosis_times_skew_
+            i['ExcessKurtosis*Skew'] = excess_kurtosis_times_skew_
+            i['CompoundedReturn'] = compounded_return
+            i['CAGR'] = cagr
             i['MaxDD'] = max_drawdown
+            i['MarkowitzReturnFunction'] = markowitz_return_function
+            i['AvgReturn/StDev'] = i['AvgReturn'] / i['StDev']
+            i['MedianReturn/StDev'] = i['MedianReturn'] / i['StDev']
+            i['CAGR/StDev'] = i['CAGR'] / i['StDev']
+            i['AvgReturn/MaxDD'] = i['AvgReturn'] / abs(i['MaxDD'])
+            i['MedianReturn/MaxDD'] = i['MedianReturn'] / abs(i['MaxDD'])
+            i['CAGR/MaxDD'] = i['CAGR'] / abs(i['MaxDD'])
+            # gain to pain ratio
+            # information_ratio
+            i['SharpeRatio'] = sharpe
+            i['SharpeRatioAnnualized'] = sharpe * np.sqrt(12)
+            # i['SortinoRatio'] = sortino
+            # i['SortinoRatioAnnualized'] = sortino * np.sqrt(12)
+            i['CalmarRatio'] = calmar
+            i['CalmarRatioAnnualized'] = calmar * np.sqrt(12)
+            i['Gaussian VaR'] = gaussian_var
+            i['CornishFisher VaR'] = modified_cornish_fisher_var
+            i['Winning-AvgReturn'] = winning_average_return
+            i['Winning-MedianReturn'] = winning_median_return
+            i['Winning-MaxReturn'] = winning_max_return
+            i['Winning-MinReturn'] = winning_min_return
+            i['Winning-StDev'] = winning_st_dev
+            i['Winning-NumOfPeriods'] = winning_num_periods
+            i['Losing-AvgReturn'] = losing_average_return
+            i['Losing-MedianReturn'] = losing_median_return
+            i['Losing-MaxReturn'] = losing_max_return
+            i['Losing-MinReturn'] = losing_min_return
+            i['Losing-StDev'] = losing_st_dev
+            i['Losing-NumOfPeriods'] = losing_num_periods
+            i['Total-NumOfPeriods'] = total_num_periods
+            i['WinningPerc (%)'] = winning_periods_percentage
+            i['LosingPerc (%)'] = losing_periods_percentage
+            # i['Win-Loss Ratio'] = win_loss_ratio
+            # i['Expectancy (+)'] = expectancy
+            # i['ExepectancyRatio (%)'] = expectancy_ratio
+            
             db.append(i)
         return db
-    
-    def average_return_over_st_dev(self):
+
+    def downside_deviation(self):
         db = []
-        st_devs = self.standard_devation()
-        avg_returns = self.average_return()
-        for (avg_return, st_dev) in zip(avg_returns, st_devs):
-            avg_ret = avg_return['AvgReturn']
-            st_dev_ = st_dev['StDev']
-            df = pd.merge_ordered(avg_ret, st_dev_, on='Date')
-            df['AvgReturn / StDev'] = df['AvgReturn'] / df['StDev']
-            db.append(df)
-        return db
 
-    def median_return_over_st_dev(self):
-        db = []
-        st_devs = self.standard_devation()
-        median_returns = self.median_return()
-        for (median_return, st_dev) in zip(median_returns, st_devs):
-            median_ret = median_return['MedReturn']
-            st_dev_ = st_dev['StDev']
-            df = pd.merge_ordered(median_ret, st_dev_, on='Date')
-            df['MedReturn / StDev'] = df['MedReturn'] / df['StDev']
-            db.append(df)
-        return db
-
-    def cagr_over_st_dev(self):
-        db = []
-        st_devs = self.standard_devation()
-        cagrs = self.cagr()
-        for (cagr, st_dev) in zip(cagrs, st_devs):
-            cagr_ = cagr['CAGR']
-            st_dev_ = st_dev['StDev']
-            df = pd.merge_ordered(cagr_, st_dev_, on='Date')
-            df['CAGR / StDev'] = df['CAGR'] / df['StDev']
-            db.append(df)
-        return db
-
-    def average_return_over_max_dd(self):
-        db = []
-        max_dds = self.max_drawdown()
-        avg_returns = self.average_return()
-        for (avg_return, max_dd) in zip(avg_returns, max_dds):
-            avg_ret = avg_return['AvgReturn']
-            dd = max_dd['MaxDD']
-            df = pd.merge_ordered(avg_ret, dd, on='Date')
-            df['AvgReturn / MaxDD'] = df['AvgReturn'] / abs(df['MaxDD'])
-            db.append(df)
-        return db
-
-    def median_return_over_max_dd(self):
-        db = []
-        max_dds = self.max_drawdown()
-        median_returns = self.median_return()
-        for (median_return, max_dd) in zip(median_returns, max_dds):
-            median_ret = median_return['MedReturn']
-            dd = max_dd['MaxDD']
-            df = pd.merge_ordered(median_ret, dd, on='Date')
-            df['MedReturn / MaxDD'] = df['MedReturn'] / abs(df['MaxDD'])
-            db.append(df)
-        return db
-
-    def cagr_over_max_dd(self):
-        db = []
-        max_dds = self.max_drawdown()
-        cagrs = self.cagr()
-        for (cagr, max_dd) in zip(cagrs, max_dds):
-            cagr_ = cagr['CAGR']
-            dd = max_dd['MaxDD']
-            df = pd.merge_ordered(cagr_, dd, on='Date')
-            df['CAGR / MaxDD'] = df['CAGR'] / abs(df['MaxDD'])
-            db.append(df)
-        return db
-
-# gain to pain ratio
-# information_ratio
-
-    def sharpe_ratio(self):
-        db = []
-        st_devs = self.standard_devation()
-        avg_returns = self.average_return()
-
-        for (avg_return, st_dev) in zip(avg_returns, st_devs):
-            rp = avg_return['AvgReturn']
-            st_dev_ = st_dev['StDev']
-            df = pd.merge_ordered(rp, st_dev_, on='Date')
-            # Sharpe Ratio = (rp - rf) / st_dev
-            sharpe = (df['AvgReturn'] - self.rf) / df['StDev']
-            df['Sharpe'] = sharpe
-            df['SharpeAnnualized'] = sharpe * np.sqrt(12)
-            db.append(df)
-        return db
-
-    def sortino_ratio(self):
-        db = []
-        downside_deviations = self.downside_devation()
-        avg_returns = self.average_return()
-
-        for (avg_return, downside_deviation) in zip(avg_returns, downside_deviations):
-            rp = avg_return['AvgReturn']
-            downside_deviation_ = downside_deviation['DownsideDev']
-            df = pd.merge_ordered(rp, downside_deviation_, on='Date')
-            # Sortino Ratio = (rp - rf) / downside_deviation
-            sortino = (df['AvgReturn'] - self.rf) / df['DownsideDev']
-            df['Sortino'] = sortino
-            df['SortinoAnnualized'] = sortino * np.sqrt(12)
-            db.append(df)
-        return db
-
-    def calmar_ratio(self):
-        db = []
-        max_dds = self.max_drawdown()
-        avg_returns = self.average_return()
-
-        for (avg_return, max_dd) in zip(avg_returns, max_dds):
-            rp = avg_return['AvgReturn']
-            max_dd_ = max_dd['MaxDD']
-            df = pd.merge_ordered(rp, max_dd_, on='Date')
-            # Calmar Ratio = (rp - rf) / max_dd
-            calmar = (df['AvgReturn'] - self.rf) / abs(df['MaxDD'])
-            df['Calmar'] = calmar
-            df['CalmarAnnualized'] = calmar * np.sqrt(12)
-            db.append(df)
+        for i in self.file_list:
+            file_name = i.columns[0]
+            downside_deviation_ = i[i[file_name] < 0].expanding().std() # deviations of only the negative returns
+            i['DownsideDev'] = downside_deviation_
+            db.append(i)
         return db
