@@ -13,11 +13,11 @@ class MonthlyStatistics:
         self.rf = 0.02 / 12
 
     def statistics(self):
-        benchmark_statistics = []
-        fund_statistics = []
+        benchmark_stats = []
+        fund_stats = []
 
         for benchmark in self.benchmark_list:
-            benchmark_statistics.append(benchmark)
+            benchmark_stats.append(benchmark)
 
         for fund in self.fund_list:
             file_name = fund.columns[0]
@@ -35,7 +35,7 @@ class MonthlyStatistics:
             fund['Variance'] = fund['MonthlyReturn'].expanding().var()
 
             # Beta
-            fund['Benchmark-Return'] = benchmark_statistics[0]['SPY']
+            fund['Benchmark-Return'] = benchmark_stats[0]['SPY']
             fund['Benchmark-StDev'] = fund['Benchmark-Return'].expanding().std()
             fund['Benchmark-Correlation'] = fund['Benchmark-Return'].expanding().corr(fund['MonthlyReturn'])
             fund['Beta'] = fund['Benchmark-Correlation'] * (fund['StDev'] / fund['Benchmark-StDev'])
@@ -146,8 +146,5 @@ class MonthlyStatistics:
             # Sharpe Ratio / Skew - average return - rf / skew
             fund['Sharpe-Ratio / Skew'] = (fund['AvgReturn'] - self.rf) / abs(fund['Skew'])
 
-            fund_statistics.append(fund)
-        return fund_statistics, benchmark_statistics
-    
-    def ranking_model(self):
-        return 0
+            fund_stats.append(fund)
+        return fund_stats, benchmark_stats
