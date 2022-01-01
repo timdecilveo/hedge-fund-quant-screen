@@ -1,18 +1,18 @@
 import os
 import numpy as np
 import pandas as pd
-from scipy.stats import norm, kurtosis
-import matplotlib.pyplot as plt
-import seaborn as sns
-import datetime as dt
+from scipy.stats import norm
 from directories import Directory
-from functools import reduce
 
 class MonthlyStatistics:
     def __init__(self):
         self.directory = os.listdir(f"../data-files")
         self.file_list = Directory(self.directory).files()
         self.rf = 0.02 / 12
+
+    def benchmark_return(self, benchmark):
+
+        return 0
 
     def statistics(self):
         db = []
@@ -30,9 +30,11 @@ class MonthlyStatistics:
             i['MinReturn'] = i['MonthlyReturn'].expanding().min()
             i['StDev'] =  i['MonthlyReturn'].expanding().std()
             i['Variance'] = i['MonthlyReturn'].expanding().var()
-            # Beta
 
-            # # downside deviation of monthly percentage returns
+            # Beta
+            # i['Beta'] = 
+
+            # Downside Deviation of monthly percentage returns
             downside_deviation = i['MonthlyReturn'][i['MonthlyReturn'] < 0].expanding().std()
             i['DownsideDev'] = downside_deviation
             i['DownsideDev'].fillna(method="ffill", inplace=True)
@@ -43,20 +45,23 @@ class MonthlyStatistics:
             i['ExcessKurtosis'] = i['Kurtosis'] - 3
             i['ExcessKurtosis*Skew'] = i['ExcessKurtosis'] * i['Skew']
 
+            # Compounded Monthly Return
             time_delta_days = (end_date - start_date).days
             years = time_delta_days / 365
             i['CompoundedReturn'] = (i['MonthlyReturn'] + 1).cumprod()
+            # Compounded Annual Growth Rate
             i['CAGR'] = ((i['CompoundedReturn']) ** (1 / years)) - 1
 
+            # Maximum Drawdown
             peak = i['CompoundedReturn'].expanding(min_periods=1).max()
             drawdown = (i['CompoundedReturn'] / peak) - 1
             i['MaxDD'] = drawdown.min()
-            # # max_dd beginning date
-            # # max_dd ending date
-            # # max_dd in months
-            # # max_dd in years
-            # # max_dd duration
+            # i['MaxDD-BeginningDate'] = 
+            # i['MaxDD-EndingDate'] = 
+            # i['MaxDD-Duration-Months'] = 
+            # i['MaxDD-Duration-Years'] = 
 
+            # Markowitz Return Function
             i['MarkowitzReturnFunction'] = i['AvgReturn'] / i['Variance']
             i['MarkowitzReturnFunction (CAGR)'] = i['CAGR'] / i['Variance']
 
@@ -69,17 +74,22 @@ class MonthlyStatistics:
             i['CAGR/MaxDD'] = i['CAGR'] / abs(i['MaxDD'])
 
             # # ####################################
-            # # gain to pain ratio
-            # # information_ratio
-            # # tail_ratio
-            # # treynor_ratio
+            # # information_ratio - - need benchmark data to calculate
+            # # tail_ratio - - need to figure out how to calculate this
 
+            # Treynor Ratio
+            # i['TreynorRatio'] = (i['AvgReturn'] - self.rf) / i['Beta']
+            # i['TreynorRatio-Annualized'] = i['TreynorRatio'] * np.sqrt(12)
+
+            # Sharpe Ratio
             i['SharpeRatio'] = (i['AvgReturn'] - self.rf) / i['StDev']
             i['SharpeRatio-Annualized'] = i['SharpeRatio'] * np.sqrt(12)
 
+            # Sortino Ratio
             i['SortinoRatio'] = (i['AvgReturn'] - self.rf) / i['DownsideDev']
             i['SortinoRatio-Annualized'] = i['SortinoRatio'] * np.sqrt(12)
 
+            # Calmar Ratio
             i['CalmarRatio'] = (i['AvgReturn'] - self.rf) / abs(i['MaxDD'])
             i['CalmarRatio-Annualized'] = i['CalmarRatio'] * np.sqrt(12)
 
@@ -103,7 +113,7 @@ class MonthlyStatistics:
             i['Winning-StDev'] = i['Winning-Return'].expanding().std()
             i['Winning-Variance'] = i['Winning-Return'].expanding().var()
             i['Winning-NumOfPeriods'] = i['Winning-Return'].expanding().count()
-            i['WinningPerc (%)'] = i['Winning-NumOfPeriods'] / i['Total-NumOfPeriods']
+            i['WinningPerc-(%)'] = i['Winning-NumOfPeriods'] / i['Total-NumOfPeriods']
 
             # Losing Months
             i['Losing-Return'] = i['MonthlyReturn'][i['MonthlyReturn'] < 0]
@@ -114,12 +124,22 @@ class MonthlyStatistics:
             i['Losing-StDev'] = i['Losing-Return'].expanding().std()
             i['Losing-Variance'] = i['Losing-Return'].expanding().var()
             i['Losing-NumOfPeriods'] = i['Losing-Return'].expanding().count()
-            i['LosingPerc (%)'] = i['Losing-NumOfPeriods'] / i['Total-NumOfPeriods']
+            i['LosingPerc-(%)'] = i['Losing-NumOfPeriods'] / i['Total-NumOfPeriods']
 
             # Win-Loss Calcs
-            i['Win-Loss Ratio'] = i['Winning-NumOfPeriods'] / i['Losing-NumOfPeriods']
-            i['Expectancy (+)'] = (i['Winning-MedianReturn'] * i['Winning-NumOfPeriods']) + (i['Losing-MedianReturn'] * i['Losing-NumOfPeriods'])
-            i['ExepectancyRatio (%)'] = (i['Winning-MedianReturn'] * i['Winning-NumOfPeriods']) / abs((i['Losing-MedianReturn'] * i['Losing-NumOfPeriods']))
+            i['Win-Loss-Ratio'] = i['Winning-NumOfPeriods'] / i['Losing-NumOfPeriods']
+            i['Expectancy-(+)'] = (i['Winning-MedianReturn'] * i['Winning-NumOfPeriods']) + (i['Losing-MedianReturn'] * i['Losing-NumOfPeriods'])
+            i['ExepectancyRatio-(%)'] = (i['Winning-MedianReturn'] * i['Winning-NumOfPeriods']) / abs((i['Losing-MedianReturn'] * i['Losing-NumOfPeriods']))
+            
+            # Gain to Pain Ratio
+            i['Sum-of-Returns'] = i['MonthlyReturn'].expanding().sum()
+            i['Sum-of-Losses'] = i['MonthlyReturn'][i['MonthlyReturn'] < 0].expanding().sum()
+            i['Sum-of-Losses'].fillna(method='ffill', inplace=True)
+            i['Gain-to-Pain-Ratio'] = i['Sum-of-Returns'] / abs(i['Sum-of-Losses'])
+
+            # Sharpe Ratio / Skew - average return - rf / skew
+            i['Sharpe-Ratio / Skew'] = (i['AvgReturn'] - self.rf) / abs(i['Skew'])
+
 
             db.append(i)
         return db
