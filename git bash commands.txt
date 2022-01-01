@@ -6,11 +6,11 @@ conda activate
 
 Flask env:
 To create env:
-conda create -n hfqmenv flask
+conda create -n hfqm_env flask
 
 -------------------------------------------------------------------------
 
 To activate env:
-conda activate hfqmenv
+conda activate hfqm_env
 
 -------------------------------------------------------------------------
