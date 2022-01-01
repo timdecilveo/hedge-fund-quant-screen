@@ -32,7 +32,10 @@ class MonthlyStatistics:
             i['Variance'] = i['MonthlyReturn'].expanding().var()
 
             # Beta
-            # i['Beta'] = 
+            # i['Benchmark-Returns'] = 
+            # i['Benchmark-StDev'] = 
+            # i['Benchmark-Correlation'] = 
+            # i['Beta'] = i['Benchmark-Correlation'] * (i['StDev'] / i['Benchmark-StDev'])
 
             # Downside Deviation of monthly percentage returns
             downside_deviation = i['MonthlyReturn'][i['MonthlyReturn'] < 0].expanding().std()
