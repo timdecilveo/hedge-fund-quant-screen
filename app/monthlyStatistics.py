@@ -17,13 +17,6 @@ class MonthlyStatistics:
         fund_statistics = []
 
         for benchmark in self.benchmark_list:
-            file_name = benchmark.columns[0]
-            dates = benchmark[file_name].index
-            start_date = dates[0]
-            end_date = dates[-1] #need to fix this so it's the rolling date
-
-            # benchmark['Benchmark-MonthlyReturn'] = benchmark[file_name]
-
             benchmark_statistics.append(benchmark)
 
         for fund in self.fund_list:
@@ -32,6 +25,7 @@ class MonthlyStatistics:
             start_date = dates[0]
             end_date = dates[-1] #need to fix this so it's the rolling date
 
+            # Basic Monthly Statistics
             fund['MonthlyReturn'] = fund[file_name]
             fund['AvgReturn'] = fund['MonthlyReturn'].expanding().mean()
             fund['MedianReturn'] = fund['MonthlyReturn'].expanding().median()
@@ -154,3 +148,6 @@ class MonthlyStatistics:
 
             fund_statistics.append(fund)
         return fund_statistics, benchmark_statistics
+    
+    def ranking_model(self):
+        return 0
