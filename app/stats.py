@@ -157,148 +157,16 @@ class Stats:
 
             i['Total-NumOfPeriods'] = i['MonthlyReturn'].expanding().count()
 
-            # i['WinningPerc (%)'] = winning_periods_percentage
-            # i['LosingPerc (%)'] = losing_periods_percentage
-            # i['Win-Loss Ratio'] = win_loss_ratio
-            # i['Expectancy (+)'] = expectancy
-            # i['ExepectancyRatio (%)'] = expectancy_ratio
-
-            # winning_median_return = i[winning].expanding().median()
-            # winning_median_return.name = 'winning_median_return'
-
-            # winning_max_return = i[winning].expanding().max()
-            # winning_max_return.name = 'winning_max_return'
-
-            # winning_min_return = i[winning].expanding().min()
-            # winning_min_return.name = 'winning_min_return'
-
-            # winning_st_dev = i[winning].expanding().std()
-            # winning_st_dev.name = 'winning_st_dev'
-
-            # winning_num_periods = i[winning].expanding().count()
-            # winning_num_periods.name = 'winning_num_periods'
-
-            # # Losing Months
-            # losing_average_return = i[losing].expanding().mean()
-            # losing_average_return.name = 'losing_average_return'
-
-            # losing_median_return = i[losing].expanding().median()
-            # losing_median_return.name = 'losing_median_return'
-
-            # losing_max_return = i[losing].expanding().max()
-            # losing_max_return.name = 'losing_max_return'
-
-            # losing_min_return = i[losing].expanding().min()
-            # losing_min_return.name = 'losing_min_return'
-
-            # losing_st_dev = i[losing].expanding().std()
-            # losing_st_dev.name = 'losing_st_dev'
-
-            # losing_num_periods = i[losing].expanding().count()
-            # losing_num_periods.name = 'losing_num_periods'
-
-            # # Total Months
-            # total_num_periods = monthly_return.expanding().count()
-            # total_num_periods.name = 'total_num_periods'
-
-            # vars_ = [
-                # downside_deviation,
-                # sortino,
-                # winning_average_return,
-                # winning_median_return,
-                # winning_max_return,
-                # winning_min_return,
-                # winning_st_dev,
-                # winning_num_periods,
-                # losing_average_return,
-                # losing_median_return,
-                # losing_max_return,
-                # losing_min_return,
-                # losing_st_dev,
-                # losing_num_periods,
-                # total_num_periods,
-            # ]
-            # column_names = ['Date',
-            #     # 'downside_deviation',
-            #     # 'sortino',
-            #     'winning_average_return',
-            #     'winning_median_return',
-            #     'winning_max_return',
-            #     'winning_min_return',
-            #     'winning_st_dev',
-            #     'winning_num_periods',
-            #     'losing_average_return',
-            #     'losing_median_return',
-            #     'losing_max_return',
-            #     'losing_min_return',
-            #     'losing_st_dev',
-            #     'losing_num_periods',
-            #     'total_num_periods',
-            # ]
-            # df_merged = reduce(lambda  left,right: pd.merge_ordered(left, right, on=['Date'], how='outer', fill_method='ffill'), vars_)
-            # for (i, column_name) in zip(df_merged, column_names):
-            #     # print(f'i: {i}\tcolumn_name: {column_name}')
-            #     # print('--')
-            #     df_merged.rename(columns={i: column_name}, inplace=True)
-            #     # df_merged.rename(columns={i: column_name})
-            
-            # index_date = df_merged.columns[0]
-            # df_merged.set_index(index_date, inplace=True)
-            # print(df_merged)
-
-            # Winning vs. Losing Months Calculations
-            # Winning Months Calcs
-            # df_winning_periods_percentage = pd.merge_ordered(winning_num_periods, total_num_periods, on='Date', suffixes=('_win', '_total'), fill_method='ffill')
-            # index = df_winning_periods_percentage.columns[0]
-            # win_col = df_winning_periods_percentage.columns[1]
-            # total_col = df_winning_periods_percentage.columns[2]
-            # df_winning_periods_percentage.set_index(index, inplace=True)
-            # df_winning_periods_percentage['WinningPerc (%)'] = df_winning_periods_percentage[win_col] / df_winning_periods_percentage[total_col]
-            # winning_periods_percentage = df_winning_periods_percentage['WinningPerc (%)']
-
-            # # Losing Months Calcs
-            # df_losing_periods_percentage = pd.merge_ordered(losing_num_periods, total_num_periods, on='Date', suffixes=('_lose', '_total'), fill_method='ffill')
-            # index = df_losing_periods_percentage.columns[0]
-            # los_col = df_losing_periods_percentage.columns[1]
-            # total_col = df_losing_periods_percentage.columns[2]
-            # df_losing_periods_percentage.set_index(index, inplace=True)
-            # df_losing_periods_percentage['LosingPerc (%)'] = df_losing_periods_percentage[los_col] / df_losing_periods_percentage[total_col]
-            # losing_periods_percentage = df_losing_periods_percentage['LosingPerc (%)']
-
-            # df_win_loss_ratio = pd.merge_ordered(winning_num_periods, losing_num_periods, on='Date', suffixes=('_win', '_loss'), fill_method='ffill')
-            # index = df_win_loss_ratio.columns[0]
-            # win_col = df_win_loss_ratio.columns[1]
-            # lose_col = df_win_loss_ratio.columns[2]
-            # df_win_loss_ratio.set_index(index, inplace=True)
-            # df_win_loss_ratio['Win-Loss Ratio'] = df_win_loss_ratio[win_col] / df_win_loss_ratio[lose_col]
-            # win_loss_ratio = df_win_loss_ratio['Win-Loss Ratio']
-
-            # expectancy = (winning_median_return * winning_num_periods) + (losing_median_return * losing_num_periods)
-            # expectancy_ratio = (winning_median_return * winning_num_periods) / abs((losing_median_return * losing_num_periods))
+            i['WinningPerc (%)'] = i['Winning-NumOfPeriods'] / i['Total-NumOfPeriods']
+            i['LosingPerc (%)'] = i['Losing-NumOfPeriods'] / i['Total-NumOfPeriods']
+            i['Win-Loss Ratio'] = i['Winning-NumOfPeriods'] / i['Losing-NumOfPeriods']
+            i['Expectancy (+)'] = (i['Winning-MedianReturn'] * i['Winning-NumOfPeriods']) + (i['Losing-MedianReturn'] * i['Losing-NumOfPeriods'])
+            i['ExepectancyRatio (%)'] = (i['Winning-MedianReturn'] * i['Winning-NumOfPeriods']) / abs((i['Losing-MedianReturn'] * i['Losing-NumOfPeriods']))
 
             # ####################################
             # gain to pain ratio
             # information_ratio
 
-
-            # i['Winning-AvgReturn'] = winning_average_return
-            # i['Winning-MedianReturn'] = winning_median_return
-            # i['Winning-MaxReturn'] = winning_max_return
-            # i['Winning-MinReturn'] = winning_min_return
-            # i['Winning-StDev'] = winning_st_dev
-            # i['Winning-NumOfPeriods'] = winning_num_periods
-            # i['Losing-AvgReturn'] = losing_average_return
-            # i['Losing-MedianReturn'] = losing_median_return
-            # i['Losing-MaxReturn'] = losing_max_return
-            # i['Losing-MinReturn'] = losing_min_return
-            # i['Losing-StDev'] = losing_st_dev
-            # i['Losing-NumOfPeriods'] = losing_num_periods
-            # i['Total-NumOfPeriods'] = total_num_periods
-            # i['WinningPerc (%)'] = winning_periods_percentage
-            # i['LosingPerc (%)'] = losing_periods_percentage
-            # i['Win-Loss Ratio'] = win_loss_ratio
-            # i['Expectancy (+)'] = expectancy
-            # i['ExepectancyRatio (%)'] = expectancy_ratio
             
             db.append(i)
         return db
