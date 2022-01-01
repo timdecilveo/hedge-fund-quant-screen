@@ -1,4 +1,5 @@
 from monthlyStatistics import MonthlyStatistics
 
-statistics = MonthlyStatistics().statistics()
-print(statistics)
+fund_statistics, benchmark_statistics = MonthlyStatistics().statistics()
+print(fund_statistics)
+# print(benchmark_statistics)
