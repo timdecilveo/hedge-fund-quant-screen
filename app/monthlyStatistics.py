@@ -8,7 +8,7 @@ import datetime as dt
 from directories import Directory
 from functools import reduce
 
-class Stats:
+class MonthlyStatistics:
     def __init__(self):
         self.directory = os.listdir(f"../data-files")
         self.file_list = Directory(self.directory).files()

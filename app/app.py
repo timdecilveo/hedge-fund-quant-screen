@@ -1,7 +1,7 @@
-from stats import Stats
+from monthlyStatistics import MonthlyStatistics
 
 
-statistics = Stats().statistics()
+statistics = MonthlyStatistics().statistics()
 # losing_months = Stats().losing_months()
 
 
