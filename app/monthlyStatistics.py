@@ -101,11 +101,11 @@ class MonthlyStatistics:
 
             # # Parametric/Gaussian VaR
             z = norm.ppf(0.05)
-            fund['Gaussian VaR'] = -(fund['AvgReturn'] + z * fund['MonthlyReturn'].std(ddof=0))
+            fund['Gaussian-VaR'] = -(fund['AvgReturn'] + z * fund['MonthlyReturn'].std(ddof=0))
 
             # Modified Cornish Fisher VaR
             z = (z + (z**2 - 1) * fund['Skew'] / 6 + (z**3 - 3 * z) * (fund['Kurtosis'] - 3) / 24 - (2 * z**3 - 5 * z) * (fund['Skew']**2) / 36)
-            fund['CornishFisher VaR'] = -(fund['AvgReturn'] + z * fund['MonthlyReturn'].std(ddof=0))
+            fund['CornishFisher-VaR'] = -(fund['AvgReturn'] + z * fund['MonthlyReturn'].std(ddof=0))
 
             # Total Months
             fund['Total-NumOfPeriods'] = fund['MonthlyReturn'].expanding().count()
