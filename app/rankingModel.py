@@ -9,9 +9,6 @@ class RankingModel:
     
     def metrics_dataframes(self):
         fund_stats, benchmark_stats = self.monthlyStats.statistics()
-        q_deciles = 10
-        q_quartiles = 4
-        label_quartiles = ['1stQ', '2ndQ', '3rdQ', '4thQ']
 
         df_AvgReturn = pd.DataFrame()
         df_MedianReturn = pd.DataFrame()
@@ -75,7 +72,6 @@ class RankingModel:
         for fund_stat in fund_stats:
             features = fund_stat.columns[1:]
             fund_name = fund_stat.columns[0]
-            # dates = fund_stat[fund_name].index
 
             for feature in features:
                 if feature == 'AvgReturn':
@@ -98,11 +94,11 @@ class RankingModel:
                     df_Skew[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'Kurtosis':
                     df_Kurtosis[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Kurt*Skew':
+                if feature == 'Kurt_times_Skew':
                     df_Kurt_Skew[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'ExcessKurtosis':
                     df_ExcessKurtosis[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'ExcessKurtosis*Skew':
+                if feature == 'ExcessKurtosis_times_Skew':
                     df_ExcessKurtosis_Skew[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'CompoundedReturn':
                     df_CompoundedReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
@@ -197,97 +193,18 @@ class RankingModel:
         
         return df_AvgReturn, df_MedianReturn, df_MaxReturn, df_MinReturn, df_StDev, df_Variance, df_Beta, df_DownsideDev, df_Skew, df_Kurtosis, df_Kurt_Skew, df_ExcessKurtosis, df_ExcessKurtosis_Skew, df_CompoundedReturn, df_CAGR, df_MaxDD, df_MarkowitzReturnFunction, df_MarkowitzReturnFunction_CAGR, df_AvgReturn_StDev, df_MedianReturn_StDev, df_CAGR_StDev, df_AvgReturn_MaxDD, df_MedianReturn_MaxDD, df_CAGR_MaxDD, df_TreynorRatio, df_TreynorRatio_Annualized, df_SharpeRatio, df_SharpeRatio_Annualized, df_SortinoRatio, df_SortinoRatio_Annualized, df_CalmarRatio, df_CalmarRatio_Annualized, df_Gaussian_VaR, df_CornishFisher_VaR, df_Total_NumOfPeriods, df_Winning_AvgReturn, df_Winning_MedianReturn, df_Winning_MaxReturn, df_Winning_MinReturn, df_Winning_StDev, df_Winning_Variance, df_Winning_NumOfPeriods, df_WinningPerc, df_Losing_AvgReturn, df_Losing_MedianReturn, df_Losing_MaxReturn, df_Losing_MinReturn, df_Losing_StDev, df_Losing_Variance, df_Losing_NumOfPeriods, df_LosingPerc, df_Win_Loss_Ratio, df_Expectancy, df_ExepectancyRatio, df_Sum_of_Returns, df_Sum_of_Losses, df_Gain_to_Pain_Ratio, df_Sharpe_Ratio_Skew
 
-    def metrics_transposed(self):
-        df_AvgReturn, df_MedianReturn, df_MaxReturn, df_MinReturn, df_StDev, df_Variance, df_Beta, df_DownsideDev, df_Skew, df_Kurtosis, df_Kurt_Skew, df_ExcessKurtosis, df_ExcessKurtosis_Skew, df_CompoundedReturn, df_CAGR, df_MaxDD, df_MarkowitzReturnFunction, df_MarkowitzReturnFunction_CAGR, df_AvgReturn_StDev, df_MedianReturn_StDev, df_CAGR_StDev, df_AvgReturn_MaxDD, df_MedianReturn_MaxDD, df_CAGR_MaxDD, df_TreynorRatio, df_TreynorRatio_Annualized, df_SharpeRatio, df_SharpeRatio_Annualized, df_SortinoRatio, df_SortinoRatio_Annualized, df_CalmarRatio, df_CalmarRatio_Annualized, df_Gaussian_VaR, df_CornishFisher_VaR, df_Total_NumOfPeriods, df_Winning_AvgReturn, df_Winning_MedianReturn, df_Winning_MaxReturn, df_Winning_MinReturn, df_Winning_StDev, df_Winning_Variance, df_Winning_NumOfPeriods, df_WinningPerc, df_Losing_AvgReturn, df_Losing_MedianReturn, df_Losing_MaxReturn, df_Losing_MinReturn, df_Losing_StDev, df_Losing_Variance, df_Losing_NumOfPeriods, df_LosingPerc, df_Win_Loss_Ratio, df_Expectancy, df_ExepectancyRatio, df_Sum_of_Returns, df_Sum_of_Losses, df_Gain_to_Pain_Ratio, df_Sharpe_Ratio_Skew = self.metrics_dataframes()
+    def percentile_dataframes(self, q):
+        metrics_dataframes = RankingModel().metrics_dataframes()
+        db = []
+        
+        for metrics_df in metrics_dataframes:
+            features = metrics_df.columns
+            features[0]
+            percentiles = metrics_df.apply(lambda rank: pd.qcut(rank, q=q, labels=False, duplicates='drop'), axis=1).add_prefix('Rank_')
+            db.append(percentiles)
+            # percentiles.to_csv(f"percentile_df-{features[0]}.csv")
+        return db
 
-        t_AvgReturn = df_AvgReturn.T
-        t_MedianReturn = df_MedianReturn.T
-        t_MaxReturn = df_MaxReturn.T
-        t_MinReturn = df_MinReturn.T
-        t_StDev = df_StDev.T
-        t_Variance = df_Variance.T
-        t_Beta = df_Beta.T
-        t_DownsideDev = df_DownsideDev.T
-        t_Skew = df_Skew.T
-        t_Kurtosis = df_Kurtosis.T
-        t_Kurt_Skew = df_Kurt_Skew.T
-        t_ExcessKurtosis = df_ExcessKurtosis.T
-        t_ExcessKurtosis_Skew = df_ExcessKurtosis_Skew.T
-        t_CompoundedReturn = df_CompoundedReturn.T
-        t_CAGR = df_CAGR.T
-        t_MaxDD = df_MaxDD.T
-        t_MarkowitzReturnFunction = df_MarkowitzReturnFunction.T
-        t_MarkowitzReturnFunction_CAGR = df_MarkowitzReturnFunction_CAGR.T
-        t_AvgReturn_StDev = df_AvgReturn_StDev.T
-        t_MedianReturn_StDev = df_MedianReturn_StDev.T
-        t_CAGR_StDev = df_CAGR_StDev.T
-        t_AvgReturn_MaxDD = df_AvgReturn_MaxDD.T
-        t_MedianReturn_MaxDD = df_MedianReturn_MaxDD.T
-        t_CAGR_MaxDD = df_CAGR_MaxDD.T
-        t_TreynorRatio = df_TreynorRatio.T
-        t_TreynorRatio_Annualized = df_TreynorRatio_Annualized.T
-        t_SharpeRatio = df_SharpeRatio.T
-        t_SharpeRatio_Annualized = df_SharpeRatio_Annualized.T
-        t_SortinoRatio = df_SortinoRatio.T
-        t_SortinoRatio_Annualized = df_SortinoRatio_Annualized.T
-        t_CalmarRatio = df_CalmarRatio.T
-        t_CalmarRatio_Annualized = df_CalmarRatio_Annualized.T
-        t_Gaussian_VaR = df_Gaussian_VaR.T
-        t_CornishFisher_VaR = df_CornishFisher_VaR.T
-        t_Total_NumOfPeriods = df_Total_NumOfPeriods.T
-        t_Winning_AvgReturn = df_Winning_AvgReturn.T
-        t_Winning_MedianReturn = df_Winning_MedianReturn.T
-        t_Winning_MaxReturn = df_Winning_MaxReturn.T
-        t_Winning_MinReturn = df_Winning_MinReturn.T
-        t_Winning_StDev = df_Winning_StDev.T
-        t_Winning_Variance = df_Winning_Variance.T
-        t_Winning_NumOfPeriods = df_Winning_NumOfPeriods.T
-        t_WinningPerc = df_WinningPerc.T
-        t_Losing_AvgReturn = df_Losing_AvgReturn.T
-        t_Losing_MedianReturn = df_Losing_MedianReturn.T
-        t_Losing_MaxReturn = df_Losing_MaxReturn.T
-        t_Losing_MinReturn = df_Losing_MinReturn.T
-        t_Losing_StDev = df_Losing_StDev.T
-        t_Losing_Variance = df_Losing_Variance.T
-        t_Losing_NumOfPeriods = df_Losing_NumOfPeriods.T
-        t_LosingPerc = df_LosingPerc.T
-        t_Win_Loss_Ratio = df_Win_Loss_Ratio.T
-        t_Expectancy = df_Expectancy.T
-        t_ExepectancyRatio = df_ExepectancyRatio.T
-        t_Sum_of_Returns = df_Sum_of_Returns.T
-        t_Sum_of_Losses = df_Sum_of_Losses.T
-        t_Gain_to_Pain_Ratio = df_Gain_to_Pain_Ratio.T
-        t_Sharpe_Ratio_Skew = df_Sharpe_Ratio_Skew.T
-
-        return t_AvgReturn, t_MedianReturn, t_MaxReturn, t_MinReturn, t_StDev, t_Variance, t_Beta, t_DownsideDev, t_Skew, t_Kurtosis, t_Kurt_Skew, t_ExcessKurtosis, t_ExcessKurtosis_Skew, t_CompoundedReturn, t_CAGR, t_MaxDD, t_MarkowitzReturnFunction, t_MarkowitzReturnFunction_CAGR, t_AvgReturn_StDev, t_MedianReturn_StDev, t_CAGR_StDev, t_AvgReturn_MaxDD, t_MedianReturn_MaxDD, t_CAGR_MaxDD, t_TreynorRatio, t_TreynorRatio_Annualized, t_SharpeRatio, t_SharpeRatio_Annualized, t_SortinoRatio, t_SortinoRatio_Annualized, t_CalmarRatio, t_CalmarRatio_Annualized, t_Gaussian_VaR, t_CornishFisher_VaR, t_Total_NumOfPeriods, t_Winning_AvgReturn, t_Winning_MedianReturn, t_Winning_MaxReturn, t_Winning_MinReturn, t_Winning_StDev, t_Winning_Variance, t_Winning_NumOfPeriods, t_WinningPerc, t_Losing_AvgReturn, t_Losing_MedianReturn, t_Losing_MaxReturn, t_Losing_MinReturn, t_Losing_StDev, t_Losing_Variance, t_Losing_NumOfPeriods, t_LosingPerc, t_Win_Loss_Ratio, t_Expectancy, t_ExepectancyRatio, t_Sum_of_Returns, t_Sum_of_Losses, t_Gain_to_Pain_Ratio, t_Sharpe_Ratio_Skew
-
-    def ranking_model(self):
-        t_AvgReturn, t_MedianReturn, t_MaxReturn, t_MinReturn, t_StDev, t_Variance, t_Beta, t_DownsideDev, t_Skew, t_Kurtosis, t_Kurt_Skew, t_ExcessKurtosis, t_ExcessKurtosis_Skew, t_CompoundedReturn, t_CAGR, t_MaxDD, t_MarkowitzReturnFunction, t_MarkowitzReturnFunction_CAGR, t_AvgReturn_StDev, t_MedianReturn_StDev, t_CAGR_StDev, t_AvgReturn_MaxDD, t_MedianReturn_MaxDD, t_CAGR_MaxDD, t_TreynorRatio, t_TreynorRatio_Annualized, t_SharpeRatio, t_SharpeRatio_Annualized, t_SortinoRatio, t_SortinoRatio_Annualized, t_CalmarRatio, t_CalmarRatio_Annualized, t_Gaussian_VaR, t_CornishFisher_VaR, t_Total_NumOfPeriods, t_Winning_AvgReturn, t_Winning_MedianReturn, t_Winning_MaxReturn, t_Winning_MinReturn, t_Winning_StDev, t_Winning_Variance, t_Winning_NumOfPeriods, t_WinningPerc, t_Losing_AvgReturn, t_Losing_MedianReturn, t_Losing_MaxReturn, t_Losing_MinReturn, t_Losing_StDev, t_Losing_Variance, t_Losing_NumOfPeriods, t_LosingPerc, t_Win_Loss_Ratio, t_Expectancy, t_ExepectancyRatio, t_Sum_of_Returns, t_Sum_of_Losses, t_Gain_to_Pain_Ratio, t_Sharpe_Ratio_Skew = self.metrics_transposed()
-        metrics = self.metrics_transposed()
-        quartiles = 4
-        deciles = 10
-        db = []     
-
-
-        for metric in metrics:
-            features = metric.columns
-            stat = metric.index
-            for feature in features:
-                feature = feature.date()
-                # print(feature)
-                # feature = feature.pd.datetime.strftime('%Y-%m-%d')
-                print(feature)
-                print('----')
-                print(type(feature))
-
-
-
-                metric[f'Rank-{stat}-{feature}'] = pd.qcut(metric[f'{feature}'], q=quartiles, labels=False, duplicates='drop')
-                db.append(metric)
-            # print(type(features[0]))
-            # print('----')
-            # print(ind)
-            # print('----')
 
 # df_MedianReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_MedianReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
 # df_MaxReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_MaxReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')

@@ -47,9 +47,9 @@ class MonthlyStatistics:
 
             fund['Skew'] = fund['MonthlyReturn'].expanding().skew(axis=0)
             fund['Kurtosis'] = fund['MonthlyReturn'].expanding().kurt(axis=0)
-            fund['Kurt*Skew'] = fund['Kurtosis'] * fund['Skew']
+            fund['Kurt_times_Skew'] = fund['Kurtosis'] * fund['Skew']
             fund['ExcessKurtosis'] = fund['Kurtosis'] - 3
-            fund['ExcessKurtosis*Skew'] = fund['ExcessKurtosis'] * fund['Skew']
+            fund['ExcessKurtosis_times_Skew'] = fund['ExcessKurtosis'] * fund['Skew']
 
             # Compounded Monthly Return
             time_delta_days = (end_date - start_date).days
