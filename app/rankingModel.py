@@ -202,215 +202,249 @@ class RankingModel:
             features[0]
             percentiles = metrics_df.apply(lambda rank: pd.qcut(rank, q=q, labels=False, duplicates='drop'), axis=1).add_prefix('Rank_')
             db.append(percentiles)
-            # percentiles.to_csv(f"percentile_df-{features[0]}.csv")
         return db
 
+    def scoring(self, q):
+        '''
+        For Deciles:
+            - 0 is the lowest quantile, meaning the lower numbers
+            - 9 is the highest quantile, meaning the higher numbers
+            9 will be scored as 9 if a higher decile is desired
+            9 will be scored as -9 if a lower decile is desired
+        '''
+        percentile_dataframes = self.percentile_dataframes(q=q)
 
-# df_MedianReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_MedianReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_MaxReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_MaxReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_MinReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_MinReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_StDev[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_StDev[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Variance[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Variance[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Beta[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Beta[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_DownsideDev[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_DownsideDev[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Skew[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Skew[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Kurtosis[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Kurtosis[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Kurt_Skew[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Kurt_Skew[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_ExcessKurtosis[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_ExcessKurtosis[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_ExcessKurtosis_Skew[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_ExcessKurtosis_Skew[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_CompoundedReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_CompoundedReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_CAGR[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_CAGR[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_MaxDD[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_MaxDD[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_MarkowitzReturnFunction[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_MarkowitzReturnFunction[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_MarkowitzReturnFunction_CAGR[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_MarkowitzReturnFunction_CAGR[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_AvgReturn_StDev[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_AvgReturn_StDev[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_MedianReturn_StDev[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_MedianReturn_StDev[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_CAGR_StDev[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_CAGR_StDev[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_AvgReturn_MaxDD[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_AvgReturn_MaxDD[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_MedianReturn_MaxDD[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_MedianReturn_MaxDD[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_CAGR_MaxDD[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_CAGR_MaxDD[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_TreynorRatio[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_TreynorRatio[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_TreynorRatio_Annualized[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_TreynorRatio_Annualized[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_SharpeRatio[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_SharpeRatio[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_SharpeRatio_Annualized[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_SharpeRatio_Annualized[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_SortinoRatio[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_SortinoRatio[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_SortinoRatio_Annualized[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_SortinoRatio_Annualized[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_CalmarRatio[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_CalmarRatio[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_CalmarRatio_Annualized[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_CalmarRatio_Annualized[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Gaussian_VaR[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Gaussian_VaR[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_CornishFisher_VaR[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_CornishFisher_VaR[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Total_NumOfPeriods[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Total_NumOfPeriods[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Winning_AvgReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Winning_AvgReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Winning_MedianReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Winning_MedianReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Winning_MaxReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Winning_MaxReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Winning_MinReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Winning_MinReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Winning_StDev[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Winning_StDev[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Winning_Variance[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Winning_Variance[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Winning_NumOfPeriods[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Winning_NumOfPeriods[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_WinningPerc[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_WinningPerc[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Losing_AvgReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Losing_AvgReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Losing_MedianReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Losing_MedianReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Losing_MaxReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Losing_MaxReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Losing_MinReturn[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Losing_MinReturn[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Losing_StDev[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Losing_StDev[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Losing_Variance[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Losing_Variance[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Losing_NumOfPeriods[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Losing_NumOfPeriods[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_LosingPerc[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_LosingPerc[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Win_Loss_Ratio[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Win_Loss_Ratio[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Expectancy[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Expectancy[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_ExepectancyRatio[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_ExepectancyRatio[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Sum_of_Returns[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Sum_of_Returns[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Sum_of_Losses[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Sum_of_Losses[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Gain_to_Pain_Ratio[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Gain_to_Pain_Ratio[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
-# df_Sharpe_Ratio_Skew[f'Rank-{feature}-{fund_name}'] = pd.qcut(df_Sharpe_Ratio_Skew[f'{feature}-{fund_name}'], q=deciles, labels=False, duplicates='drop')
+        for percentile_df in percentile_dataframes:
+            '''
+            AvgReturn: (+) higher decile is desired
+            '''
 
+            '''            
+            MedianReturn: (+) higher decile is desired
+            '''
 
+            '''
+            MaxReturn: (+) higher decile is desired
+            '''
 
+            '''
+            MinReturn: (+) higher decile is desired
+            '''
 
+            '''
+            StDev: (N/A) in previous model, ranking wasn't calculated
+            '''
 
+            '''
+            Variance: (N/A) in previous model, ranking wasn't calculated
+            '''
 
+            '''
+            Beta: (-) lower decile is desired
+            '''
 
+            '''
+            DownsideDev
+            '''
 
+            '''
+            Skew: (+) higher decile is desired
+            '''
 
+            '''
+            Kurtosis: (+) higher decile is desired
+            '''
 
+            '''
+            Kurt_Skew: (+) higher decile is desired
+            '''
 
+            '''
+            ExcessKurtosis: (+) higher decile is desired
+            '''
 
+            '''
+            ExcessKurtosis_Skew: (+) higher decile is desired
+            '''
 
-        # for fund_stat in fund_stats:
-        #     features = fund_stat.columns[1:]
-        #     fund_name = fund_stat.columns[0]
-        #     dates = fund_stat[fund_name].index
-        #     for date in dates:
+            '''
+            CompoundedReturn: (+) higher decile is desired
+            '''
 
-        #         print(date)
-        
-        # print(df_AvgReturn)
-        # print('-------')
-        # transposed = df_AvgReturn.T
-        # print(transposed)
-        # print('-------')
-        # df_AvgReturn.to_csv(f"rank1.csv")
+            '''
+            CAGR: (+) higher decile is desired
+            '''
 
-    #     df_AvgReturn[f'RankLabel-{i}'] = pd.qcut(df_AvgReturn[f'{i}'], q=q_quartiles, labels=label_quartiles, duplicates='drop')
-    #     df_AvgReturn[f'Rank-{i}'] = pd.qcut(df_AvgReturn[f'{i}'], q=q_quartiles, labels=False, duplicates='drop')
-    #     df_AvgReturn[f'RankN-{i}'] = pd.qcut(df_AvgReturn[f'{i}'], q=q_quartiles, duplicates='drop')
+            '''
+            MaxDD: (-) lower decile is desired
+            '''
 
+            '''
+            MarkowitzReturnFunction: (+) higher decile is desired
+            '''
 
-        # print('-------')
-        # df_AvgReturn.to_csv(f"rank2.csv")
-        # print('-------')
-        # print(df_AvgReturn)
-        # print('-------')
-        # print(df_MedianReturn)
-        # print('-------')
-        # print(df_MaxReturn)
-        # print('-------')
-        # print(df_MinReturn)
-        # print('-------')
-        # print(df_StDev)
-        # print('-------')
-        # print(df_Variance)
-        # print('-------')
-        # print(df_Beta)
-        # print('-------')
-        # print(df_DownsideDev)
-        # print('-------')
-        # print(df_Skew)
-        # print('-------')
-        # print(df_Kurtosis)
-        # print('-------')
-        # print(df_Kurt_Skew)
-        # print('-------')
-        # print(df_ExcessKurtosis)
-        # print('-------')
-        # print(df_ExcessKurtosis_Skew)
-        # print('-------')
-        # print(df_CompoundedReturn)
-        # print('-------')
-        # print(df_CAGR)
-        # print('-------')
-        # print(df_MaxDD)
-        # print('-------')
-        # print(df_MarkowitzReturnFunction)
-        # print('-------')
-        # print(df_MarkowitzReturnFunction_CAGR)
-        # print('-------')
-        # print(df_AvgReturn_StDev)
-        # print('-------')
-        # print(df_MedianReturn_StDev)
-        # print('-------')
-        # print(df_CAGR_StDev)
-        # print('-------')
-        # print(df_AvgReturn_MaxDD)
-        # print('-------')
-        # print(df_MedianReturn_MaxDD)
-        # print('-------')
-        # print(df_CAGR_MaxDD)
-        # print('-------')
-        # print(df_TreynorRatio)
-        # print('-------')
-        # print(df_TreynorRatio_Annualized)
-        # print('-------')
-        # print(df_SharpeRatio)
-        # print('-------')
-        # print(df_SharpeRatio_Annualized)
-        # print('-------')
-        # print(df_SortinoRatio)
-        # print('-------')
-        # print(df_SortinoRatio_Annualized)
-        # print('-------')
-        # print(df_CalmarRatio)
-        # print('-------')
-        # print(df_CalmarRatio_Annualized)
-        # print('-------')
-        # print(df_Gaussian_VaR)
-        # print('-------')
-        # print(df_CornishFisher_VaR)
-        # print('-------')
-        # print(df_Total_NumOfPeriods)
-        # print('-------')
-        # print(df_Winning_AvgReturn)
-        # print('-------')
-        # print(df_Winning_MedianReturn)
-        # print('-------')
-        # print(df_Winning_MaxReturn)
-        # print('-------')
-        # print(df_Winning_MinReturn)
-        # print('-------')
-        # print(df_Winning_StDev)
-        # print('-------')
-        # print(df_Winning_Variance)
-        # print('-------')
-        # print(df_Winning_NumOfPeriods)
-        # print('-------')
-        # print(df_WinningPerc)
-        # print('-------')
-        # print(df_Losing_AvgReturn)
-        # print('-------')
-        # print(df_Losing_MedianReturn)
-        # print('-------')
-        # print(df_Losing_MaxReturn)
-        # print('-------')
-        # print(df_Losing_MinReturn)
-        # print('-------')
-        # print(df_Losing_StDev)
-        # print('-------')
-        # print(df_Losing_Variance)
-        # print('-------')
-        # print(df_Losing_NumOfPeriods)
-        # print('-------')
-        # print(df_LosingPerc)
-        # print('-------')
-        # print(df_Win_Loss_Ratio)
-        # print('-------')
-        # print(df_Expectancy)
-        # print('-------')
-        # print(df_ExepectancyRatio)
-        # print('-------')
-        # print(df_Sum_of_Returns)
-        # print('-------')
-        # print(df_Sum_of_Losses)
-        # print('-------')
-        # print(df_Gain_to_Pain_Ratio)
-        # print('-------')
-        # print(df_Sharpe_Ratio_Skew)
+            '''
+            MarkowitzReturnFunction_CAGR: (+) higher decile is desired
+            '''
+
+            '''
+            AvgReturn_StDev: (+) higher decile is desired
+            '''
+
+            '''
+            MedianReturn_StDev: (+) higher decile is desired
+            '''
+
+            '''
+            CAGR_StDev: (+) higher decile is desired
+            '''
+
+            '''
+            AvgReturn_MaxDD: (+) higher decile is desired
+            '''
+
+            '''
+            MedianReturn_MaxDD: (+) higher decile is desired
+            '''
+
+            '''
+            CAGR_MaxDD: (+) higher decile is desired
+            '''
+
+            '''
+            TreynorRatio: (+) higher decile is desired
+            '''
+
+            '''
+            TreynorRatio_Annualized: (+) higher decile is desired
+            '''
+
+            '''
+            SharpeRatio: (+) higher decile is desired
+            '''
+
+            '''
+            SharpeRatio_Annualized: (+) higher decile is desired
+            '''
+
+            '''
+            SortinoRatio: (+) higher decile is desired
+            '''
+
+            '''
+            SortinoRatio_Annualized: (+) higher decile is desired
+            '''
+
+            '''
+            CalmarRatio: (+) higher decile is desired
+            '''
+
+            '''
+            CalmarRatio_Annualized: (+) higher decile is desired
+            '''
+
+            '''
+            Gaussian_VaR
+            '''
+
+            '''
+            CornishFisher_VaR
+            '''
+
+            '''
+            Total_NumOfPeriods: (N/A) in previous model, ranking wasn't calculated
+            '''
+
+            '''
+            Winning_AvgReturn: (+) higher decile is desired
+            '''
+
+            '''
+            Winning_MedianReturn: (+) higher decile is desired
+            '''
+
+            '''
+            Winning_MaxReturn: (+) higher decile is desired
+            '''
+
+            '''
+            Winning_MinReturn: (+) higher decile is desired
+            '''
+
+            '''
+            Winning_StDev: (N/A) in previous model, ranking wasn't calculated
+            '''
+
+            '''
+            Winning_Variance: (N/A) in previous model, ranking wasn't calculated
+            '''
+
+            '''
+            Winning_NumOfPeriods: (N/A) in previous model, ranking wasn't calculated
+            '''
+
+            '''
+            WinningPerc: (+) higher decile is desired
+            '''
+
+            '''
+            Losing_AvgReturn: (+) higher decile is desired
+            '''
+
+            '''
+            Losing_MedianReturn: (+) higher decile is desired
+            '''
+
+            '''
+            Losing_MaxReturn: (+) higher decile is desired
+            '''
+
+            '''
+            Losing_MinReturn: (+) higher decile is desired
+            '''
+
+            '''
+            Losing_StDev: (N/A) in previous model, ranking wasn't calculated
+            '''
+
+            '''
+            Losing_Variance: (N/A) in previous model, ranking wasn't calculated
+            '''
+
+            '''
+            Losing_NumOfPeriods: (N/A) in previous model, ranking wasn't calculated
+            '''
+
+            '''
+            LosingPerc: (-) lower decile is desired
+            '''
+
+            '''
+            Win_Loss_Ratio: (+) higher decile is desired
+            '''
+
+            '''
+            Expectancy: (+) higher decile is desired
+            '''
+
+            '''
+            ExepectancyRatio: (+) higher decile is desired
+            '''
+
+            '''
+            Sum_of_Returns: (+) higher decile is desired
+            '''
+
+            '''
+            Sum_of_Losses: (-) lower decile is desired
+            '''
+
+            '''
+            Gain_to_Pain_Ratio: (+) higher decile is desired
+            '''
+
+            '''
+            Sharpe_Ratio_Skew
+            '''
+            print(percentile_df)
+
