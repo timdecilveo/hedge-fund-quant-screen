@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import re
+from functools import reduce
 from datetime import datetime
 from monthlyStatistics import MonthlyStatistics
 
@@ -228,13 +229,17 @@ class RankingModel:
         percentiles = self.percentiles()
 
         for percentile in percentiles:
+            print(type(percentile))
             cols = percentile.columns
             for col in cols:
                 fund_strategy = re.split('\^|#', col)[2]
-                if fund_strategy == 'winton-capital--futures-program':
-                    print(percentile)
-                else:
-                    print('test')
+            #     x = reduce(lambda x,y: pd.merge(x,y, on=fund_strategy, how='outer'), [percentile])
+            #     print(x)
+            #     print('---')
+                # if fund_strategy == 'winton-capital--futures-program':
+                #     print(percentile)
+                # else:
+                #     print('test')
                 # print(stat)
                 # print(fund_strategy)
 
