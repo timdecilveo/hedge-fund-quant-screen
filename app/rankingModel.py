@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import re
 from datetime import datetime
 from monthlyStatistics import MonthlyStatistics
 
@@ -20,54 +21,54 @@ class RankingModel:
         df_DownsideDev = pd.DataFrame()
         df_Skew = pd.DataFrame()
         df_Kurtosis = pd.DataFrame()
-        df_Kurt_Skew = pd.DataFrame()
+        df_KurtSkew = pd.DataFrame()
         df_ExcessKurtosis = pd.DataFrame()
-        df_ExcessKurtosis_Skew = pd.DataFrame()
+        df_ExcessKurtosisSkew = pd.DataFrame()
         df_CompoundedReturn = pd.DataFrame()
         df_CAGR = pd.DataFrame()
         df_MaxDD = pd.DataFrame()
         df_MarkowitzReturnFunction = pd.DataFrame()
-        df_MarkowitzReturnFunction_CAGR = pd.DataFrame()
-        df_AvgReturn_StDev = pd.DataFrame()
-        df_MedianReturn_StDev = pd.DataFrame()
-        df_CAGR_StDev = pd.DataFrame()
-        df_AvgReturn_MaxDD = pd.DataFrame()
-        df_MedianReturn_MaxDD = pd.DataFrame()
-        df_CAGR_MaxDD = pd.DataFrame()
+        df_MarkowitzReturnFunctionCAGR = pd.DataFrame()
+        df_AvgReturnStDev = pd.DataFrame()
+        df_MedianReturnStDev = pd.DataFrame()
+        df_CAGRStDev = pd.DataFrame()
+        df_AvgReturnMaxDD = pd.DataFrame()
+        df_MedianReturnMaxDD = pd.DataFrame()
+        df_CAGRMaxDD = pd.DataFrame()
         df_TreynorRatio = pd.DataFrame()
-        df_TreynorRatio_Annualized = pd.DataFrame()
+        df_TreynorRatioAnnualized = pd.DataFrame()
         df_SharpeRatio = pd.DataFrame()
-        df_SharpeRatio_Annualized = pd.DataFrame()
+        df_SharpeRatioAnnualized = pd.DataFrame()
         df_SortinoRatio = pd.DataFrame()
-        df_SortinoRatio_Annualized = pd.DataFrame()
+        df_SortinoRatioAnnualized = pd.DataFrame()
         df_CalmarRatio = pd.DataFrame()
-        df_CalmarRatio_Annualized = pd.DataFrame()
-        df_Gaussian_VaR = pd.DataFrame()
-        df_CornishFisher_VaR = pd.DataFrame()
-        df_Total_NumOfPeriods = pd.DataFrame()
-        df_Winning_AvgReturn = pd.DataFrame()
-        df_Winning_MedianReturn = pd.DataFrame()
-        df_Winning_MaxReturn = pd.DataFrame()
-        df_Winning_MinReturn = pd.DataFrame()
-        df_Winning_StDev = pd.DataFrame()
-        df_Winning_Variance = pd.DataFrame()
-        df_Winning_NumOfPeriods = pd.DataFrame()
+        df_CalmarRatioAnnualized = pd.DataFrame()
+        df_GaussianVaR = pd.DataFrame()
+        df_CornishFisherVaR = pd.DataFrame()
+        df_TotalNumOfPeriods = pd.DataFrame()
+        df_WinningAvgReturn = pd.DataFrame()
+        df_WinningMedianReturn = pd.DataFrame()
+        df_WinningMaxReturn = pd.DataFrame()
+        df_WinningMinReturn = pd.DataFrame()
+        df_WinningStDev = pd.DataFrame()
+        df_WinningVariance = pd.DataFrame()
+        df_WinningNumOfPeriods = pd.DataFrame()
         df_WinningPerc = pd.DataFrame()
-        df_Losing_AvgReturn = pd.DataFrame()
-        df_Losing_MedianReturn = pd.DataFrame()
-        df_Losing_MaxReturn = pd.DataFrame()
-        df_Losing_MinReturn = pd.DataFrame()
-        df_Losing_StDev = pd.DataFrame()
-        df_Losing_Variance = pd.DataFrame()
-        df_Losing_NumOfPeriods = pd.DataFrame()
+        df_LosingAvgReturn = pd.DataFrame()
+        df_LosingMedianReturn = pd.DataFrame()
+        df_LosingMaxReturn = pd.DataFrame()
+        df_LosingMinReturn = pd.DataFrame()
+        df_LosingStDev = pd.DataFrame()
+        df_LosingVariance = pd.DataFrame()
+        df_LosingNumOfPeriods = pd.DataFrame()
         df_LosingPerc = pd.DataFrame()
-        df_Win_Loss_Ratio = pd.DataFrame()
+        df_WinLossRatio = pd.DataFrame()
         df_Expectancy = pd.DataFrame()
         df_ExepectancyRatio = pd.DataFrame()
-        df_Sum_of_Returns = pd.DataFrame()
-        df_Sum_of_Losses = pd.DataFrame()
-        df_Gain_to_Pain_Ratio = pd.DataFrame()
-        df_Sharpe_Ratio_Skew = pd.DataFrame()
+        df_SumOfReturns = pd.DataFrame()
+        df_SumOfLosses = pd.DataFrame()
+        df_GainToPainRatio = pd.DataFrame()
+        df_SharpeRatioSkew = pd.DataFrame()
 
         for fund_stat in fund_stats:
             features = fund_stat.columns[1:]
@@ -75,376 +76,189 @@ class RankingModel:
 
             for feature in features:
                 if feature == 'AvgReturn':
-                    df_AvgReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_AvgReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'MedianReturn':
-                    df_MedianReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_MedianReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'MaxReturn':
-                    df_MaxReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_MaxReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'MinReturn':
-                    df_MinReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'StDev':
-                    df_StDev[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Variance':
-                    df_Variance[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_MinReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                # if feature == 'StDev':
+                #     df_StDev[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                # if feature == 'Variance':
+                #     df_Variance[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'Beta':
-                    df_Beta[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_Beta[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'DownsideDev':
-                    df_DownsideDev[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_DownsideDev[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'Skew':
-                    df_Skew[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_Skew[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'Kurtosis':
-                    df_Kurtosis[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Kurt_times_Skew':
-                    df_Kurt_Skew[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_Kurtosis[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'KurtTimesSkew':
+                    df_KurtSkew[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'ExcessKurtosis':
-                    df_ExcessKurtosis[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'ExcessKurtosis_times_Skew':
-                    df_ExcessKurtosis_Skew[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_ExcessKurtosis[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'ExcessKurtosisTimesSkew':
+                    df_ExcessKurtosisSkew[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'CompoundedReturn':
-                    df_CompoundedReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_CompoundedReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'CAGR':
-                    df_CAGR[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_CAGR[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'MaxDD':
-                    df_MaxDD[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_MaxDD[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'MarkowitzReturnFunction':
-                    df_MarkowitzReturnFunction[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'MarkowitzReturnFunction_CAGR':
-                    df_MarkowitzReturnFunction_CAGR[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'AvgReturn_StDev':
-                    df_AvgReturn_StDev[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'MedianReturn_StDev':
-                    df_MedianReturn_StDev[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'CAGR_StDev':
-                    df_CAGR_StDev[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'AvgReturn_MaxDD':
-                    df_AvgReturn_MaxDD[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'MedianReturn_MaxDD':
-                    df_MedianReturn_MaxDD[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'CAGR_MaxDD':
-                    df_CAGR_MaxDD[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_MarkowitzReturnFunction[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'MarkowitzReturnFunctionCAGR':
+                    df_MarkowitzReturnFunctionCAGR[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'AvgReturnStDev':
+                    df_AvgReturnStDev[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'MedianReturnStDev':
+                    df_MedianReturnStDev[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'CAGRStDev':
+                    df_CAGRStDev[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'AvgReturnMaxDD':
+                    df_AvgReturnMaxDD[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'MedianReturnMaxDD':
+                    df_MedianReturnMaxDD[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'CAGRMaxDD':
+                    df_CAGRMaxDD[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'TreynorRatio':
-                    df_TreynorRatio[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'TreynorRatio_Annualized':
-                    df_TreynorRatio_Annualized[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_TreynorRatio[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'TreynorRatioAnnualized':
+                    df_TreynorRatioAnnualized[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'SharpeRatio':
-                    df_SharpeRatio[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'SharpeRatio_Annualized':
-                    df_SharpeRatio_Annualized[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_SharpeRatio[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'SharpeRatioAnnualized':
+                    df_SharpeRatioAnnualized[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'SortinoRatio':
-                    df_SortinoRatio[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'SortinoRatio_Annualized':
-                    df_SortinoRatio_Annualized[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_SortinoRatio[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'SortinoRatioAnnualized':
+                    df_SortinoRatioAnnualized[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'CalmarRatio':
-                    df_CalmarRatio[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'CalmarRatio_Annualized':
-                    df_CalmarRatio_Annualized[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Gaussian_VaR':
-                    df_Gaussian_VaR[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'CornishFisher_VaR':
-                    df_CornishFisher_VaR[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Total_NumOfPeriods':
-                    df_Total_NumOfPeriods[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Winning_AvgReturn':
-                    df_Winning_AvgReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Winning_MedianReturn':
-                    df_Winning_MedianReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Winning_MaxReturn':
-                    df_Winning_MaxReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Winning_MinReturn':
-                    df_Winning_MinReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Winning_StDev':
-                    df_Winning_StDev[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Winning_Variance':
-                    df_Winning_Variance[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Winning_NumOfPeriods':
-                    df_Winning_NumOfPeriods[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_CalmarRatio[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'CalmarRatioAnnualized':
+                    df_CalmarRatioAnnualized[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'GaussianVaR':
+                    df_GaussianVaR[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'CornishFisherVaR':
+                    df_CornishFisherVaR[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                # if feature == 'Total_NumOfPeriods':
+                #     df_Total_NumOfPeriods[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'WinningAvgReturn':
+                    df_WinningAvgReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'WinningMedianReturn':
+                    df_WinningMedianReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'WinningMaxReturn':
+                    df_WinningMaxReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'WinningMinReturn':
+                    df_WinningMinReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                # if feature == 'Winning_StDev':
+                #     df_Winning_StDev[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                # if feature == 'Winning_Variance':
+                #     df_Winning_Variance[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                # if feature == 'Winning_NumOfPeriods':
+                #     df_Winning_NumOfPeriods[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'WinningPerc':
-                    df_WinningPerc[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Losing_AvgReturn':
-                    df_Losing_AvgReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Losing_MedianReturn':
-                    df_Losing_MedianReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Losing_MaxReturn':
-                    df_Losing_MaxReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Losing_MinReturn':
-                    df_Losing_MinReturn[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Losing_StDev':
-                    df_Losing_StDev[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Losing_Variance':
-                    df_Losing_Variance[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Losing_NumOfPeriods':
-                    df_Losing_NumOfPeriods[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_WinningPerc[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'LosingAvgReturn':
+                    df_LosingAvgReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'LosingMedianReturn':
+                    df_LosingMedianReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'LosingMaxReturn':
+                    df_LosingMaxReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'LosingMinReturn':
+                    df_LosingMinReturn[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                # if feature == 'LosingStDev':
+                #     df_LosingStDev[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                # if feature == 'LosingVariance':
+                #     df_LosingVariance[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                # if feature == 'LosingNumOfPeriods':
+                #     df_LosingNumOfPeriods[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'LosingPerc':
-                    df_LosingPerc[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Win_Loss_Ratio':
-                    df_Win_Loss_Ratio[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_LosingPerc[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'WinLossRatio':
+                    df_WinLossRatio[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'Expectancy':
-                    df_Expectancy[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_Expectancy[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
                 if feature == 'ExepectancyRatio':
-                    df_ExepectancyRatio[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Sum_of_Returns':
-                    df_Sum_of_Returns[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Sum_of_Losses':
-                    df_Sum_of_Losses[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Gain_to_Pain_Ratio':
-                    df_Gain_to_Pain_Ratio[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
-                if feature == 'Sharpe_Ratio_Skew':
-                    df_Sharpe_Ratio_Skew[f'{feature}-{fund_name}'] = fund_stat[f'{feature}']
+                    df_ExepectancyRatio[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'SumOfReturns':
+                    df_SumOfReturns[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'SumOfLosses':
+                    df_SumOfLosses[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'GainToPainRatio':
+                    df_GainToPainRatio[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
+                if feature == 'SharpeRatioSkew':
+                    df_SharpeRatioSkew[f'{feature}#{fund_name}'] = fund_stat[f'{feature}']
         
-        return df_AvgReturn, df_MedianReturn, df_MaxReturn, df_MinReturn, df_StDev, df_Variance, df_Beta, df_DownsideDev, df_Skew, df_Kurtosis, df_Kurt_Skew, df_ExcessKurtosis, df_ExcessKurtosis_Skew, df_CompoundedReturn, df_CAGR, df_MaxDD, df_MarkowitzReturnFunction, df_MarkowitzReturnFunction_CAGR, df_AvgReturn_StDev, df_MedianReturn_StDev, df_CAGR_StDev, df_AvgReturn_MaxDD, df_MedianReturn_MaxDD, df_CAGR_MaxDD, df_TreynorRatio, df_TreynorRatio_Annualized, df_SharpeRatio, df_SharpeRatio_Annualized, df_SortinoRatio, df_SortinoRatio_Annualized, df_CalmarRatio, df_CalmarRatio_Annualized, df_Gaussian_VaR, df_CornishFisher_VaR, df_Total_NumOfPeriods, df_Winning_AvgReturn, df_Winning_MedianReturn, df_Winning_MaxReturn, df_Winning_MinReturn, df_Winning_StDev, df_Winning_Variance, df_Winning_NumOfPeriods, df_WinningPerc, df_Losing_AvgReturn, df_Losing_MedianReturn, df_Losing_MaxReturn, df_Losing_MinReturn, df_Losing_StDev, df_Losing_Variance, df_Losing_NumOfPeriods, df_LosingPerc, df_Win_Loss_Ratio, df_Expectancy, df_ExepectancyRatio, df_Sum_of_Returns, df_Sum_of_Losses, df_Gain_to_Pain_Ratio, df_Sharpe_Ratio_Skew
+        return df_AvgReturn, df_MedianReturn, df_MaxReturn, df_MinReturn, df_Beta, df_DownsideDev, df_Skew, df_Kurtosis, df_KurtSkew, df_ExcessKurtosis, df_ExcessKurtosisSkew, df_CompoundedReturn, df_CAGR, df_MaxDD, df_MarkowitzReturnFunction, df_MarkowitzReturnFunctionCAGR, df_AvgReturnStDev, df_MedianReturnStDev, df_CAGRStDev, df_AvgReturnMaxDD, df_MedianReturnMaxDD, df_CAGRMaxDD, df_TreynorRatio, df_TreynorRatioAnnualized, df_SharpeRatio, df_SharpeRatioAnnualized, df_SortinoRatio, df_SortinoRatioAnnualized, df_CalmarRatio, df_CalmarRatioAnnualized, df_GaussianVaR, df_CornishFisherVaR, df_WinningAvgReturn, df_WinningMedianReturn, df_WinningMaxReturn, df_WinningMinReturn, df_WinningPerc, df_LosingAvgReturn, df_LosingMedianReturn, df_LosingMaxReturn, df_LosingMinReturn, df_LosingPerc, df_WinLossRatio, df_Expectancy, df_ExepectancyRatio, df_SumOfReturns, df_SumOfLosses, df_GainToPainRatio, df_SharpeRatioSkew
 
-    def percentile_dataframes(self, q):
+    def percentile_dataframes(self, q=10):
         metrics_dataframes = RankingModel().metrics_dataframes()
-        db = []
+        percentile_dataframes = []
         
         for metrics_df in metrics_dataframes:
-            features = metrics_df.columns
-            features[0]
-            percentiles = metrics_df.apply(lambda rank: pd.qcut(rank, q=q, labels=False, duplicates='drop'), axis=1).add_prefix('Rank_')
-            db.append(percentiles)
-        return db
+            percentiles = metrics_df.apply(lambda rank: pd.qcut(rank, q=q, labels=False, duplicates='drop'), axis=1).add_prefix('Rank^')
+            percentile_dataframes.append(percentiles)
+        return percentile_dataframes
 
-    def scoring(self, q):
+    def percentiles(self, q=10):
         '''
         For Deciles:
             - 0 is the lowest quantile, meaning the lower numbers
             - 9 is the highest quantile, meaning the higher numbers
+
             9 will be scored as 9 if a higher decile is desired
             9 will be scored as -9 if a lower decile is desired
         '''
         percentile_dataframes = self.percentile_dataframes(q=q)
+        percentiles = []
 
         for percentile_df in percentile_dataframes:
-            '''
-            AvgReturn: (+) higher decile is desired
-            '''
+            cols = percentile_df.columns
+            for col in cols:
+                stat = re.split('\^|#', col)[1]
+                if stat == 'Beta' or stat == 'MaxDD' or stat == 'LosingPerc' or stat == 'SumOfLosses':
+                    percentile_df = -percentile_df
+            percentiles.append(percentile_df)
+        return percentiles
 
-            '''            
-            MedianReturn: (+) higher decile is desired
-            '''
+    def ranking_model(self):
+        percentiles = self.percentiles()
 
-            '''
-            MaxReturn: (+) higher decile is desired
-            '''
+        for percentile in percentiles:
+            cols = percentile.columns
+            for col in cols:
+                fund_strategy = re.split('\^|#', col)[2]
+                if fund_strategy == 'winton-capital--futures-program':
+                    print(percentile)
+                else:
+                    print('test')
+                # print(stat)
+                # print(fund_strategy)
 
-            '''
-            MinReturn: (+) higher decile is desired
-            '''
 
-            '''
-            StDev: (N/A) in previous model, ranking wasn't calculated
-            '''
 
-            '''
-            Variance: (N/A) in previous model, ranking wasn't calculated
-            '''
 
-            '''
-            Beta: (-) lower decile is desired
-            '''
 
-            '''
-            DownsideDev
-            '''
 
-            '''
-            Skew: (+) higher decile is desired
-            '''
+        # rankings = pd.DataFrame()
+        # test = []
 
-            '''
-            Kurtosis: (+) higher decile is desired
-            '''
+        # for percentile in percentiles:
+        #     features = percentile.columns
+        #     for feature in features:
+        #         rankings[f'{feature}'] = percentile[f'{feature}']
 
-            '''
-            Kurt_Skew: (+) higher decile is desired
-            '''
 
-            '''
-            ExcessKurtosis: (+) higher decile is desired
-            '''
+        # rankings['sum'] = rankings.sum(axis=1)
+        # print(rankings)
+        # rankings['rank'] = rankings.sum()
+        # for ranking in rankings:
+        #     ranking['Rank'] = ranking.sum()
+        #     test.append(ranking)
+        # print(test)
 
-            '''
-            ExcessKurtosis_Skew: (+) higher decile is desired
-            '''
 
-            '''
-            CompoundedReturn: (+) higher decile is desired
-            '''
-
-            '''
-            CAGR: (+) higher decile is desired
-            '''
-
-            '''
-            MaxDD: (-) lower decile is desired
-            '''
-
-            '''
-            MarkowitzReturnFunction: (+) higher decile is desired
-            '''
-
-            '''
-            MarkowitzReturnFunction_CAGR: (+) higher decile is desired
-            '''
-
-            '''
-            AvgReturn_StDev: (+) higher decile is desired
-            '''
-
-            '''
-            MedianReturn_StDev: (+) higher decile is desired
-            '''
-
-            '''
-            CAGR_StDev: (+) higher decile is desired
-            '''
-
-            '''
-            AvgReturn_MaxDD: (+) higher decile is desired
-            '''
-
-            '''
-            MedianReturn_MaxDD: (+) higher decile is desired
-            '''
-
-            '''
-            CAGR_MaxDD: (+) higher decile is desired
-            '''
-
-            '''
-            TreynorRatio: (+) higher decile is desired
-            '''
-
-            '''
-            TreynorRatio_Annualized: (+) higher decile is desired
-            '''
-
-            '''
-            SharpeRatio: (+) higher decile is desired
-            '''
-
-            '''
-            SharpeRatio_Annualized: (+) higher decile is desired
-            '''
-
-            '''
-            SortinoRatio: (+) higher decile is desired
-            '''
-
-            '''
-            SortinoRatio_Annualized: (+) higher decile is desired
-            '''
-
-            '''
-            CalmarRatio: (+) higher decile is desired
-            '''
-
-            '''
-            CalmarRatio_Annualized: (+) higher decile is desired
-            '''
-
-            '''
-            Gaussian_VaR
-            '''
-
-            '''
-            CornishFisher_VaR
-            '''
-
-            '''
-            Total_NumOfPeriods: (N/A) in previous model, ranking wasn't calculated
-            '''
-
-            '''
-            Winning_AvgReturn: (+) higher decile is desired
-            '''
-
-            '''
-            Winning_MedianReturn: (+) higher decile is desired
-            '''
-
-            '''
-            Winning_MaxReturn: (+) higher decile is desired
-            '''
-
-            '''
-            Winning_MinReturn: (+) higher decile is desired
-            '''
-
-            '''
-            Winning_StDev: (N/A) in previous model, ranking wasn't calculated
-            '''
-
-            '''
-            Winning_Variance: (N/A) in previous model, ranking wasn't calculated
-            '''
-
-            '''
-            Winning_NumOfPeriods: (N/A) in previous model, ranking wasn't calculated
-            '''
-
-            '''
-            WinningPerc: (+) higher decile is desired
-            '''
-
-            '''
-            Losing_AvgReturn: (+) higher decile is desired
-            '''
-
-            '''
-            Losing_MedianReturn: (+) higher decile is desired
-            '''
-
-            '''
-            Losing_MaxReturn: (+) higher decile is desired
-            '''
-
-            '''
-            Losing_MinReturn: (+) higher decile is desired
-            '''
-
-            '''
-            Losing_StDev: (N/A) in previous model, ranking wasn't calculated
-            '''
-
-            '''
-            Losing_Variance: (N/A) in previous model, ranking wasn't calculated
-            '''
-
-            '''
-            Losing_NumOfPeriods: (N/A) in previous model, ranking wasn't calculated
-            '''
-
-            '''
-            LosingPerc: (-) lower decile is desired
-            '''
-
-            '''
-            Win_Loss_Ratio: (+) higher decile is desired
-            '''
-
-            '''
-            Expectancy: (+) higher decile is desired
-            '''
-
-            '''
-            ExepectancyRatio: (+) higher decile is desired
-            '''
-
-            '''
-            Sum_of_Returns: (+) higher decile is desired
-            '''
-
-            '''
-            Sum_of_Losses: (-) lower decile is desired
-            '''
-
-            '''
-            Gain_to_Pain_Ratio: (+) higher decile is desired
-            '''
-
-            '''
-            Sharpe_Ratio_Skew
-            '''
-            print(percentile_df)
-
+    

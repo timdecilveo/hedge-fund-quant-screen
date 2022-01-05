@@ -35,10 +35,10 @@ class MonthlyStatistics:
             fund['Variance'] = fund['MonthlyReturn'].expanding().var()
 
             # Beta
-            fund['Benchmark-Return'] = benchmark_stats[0]['SPY']
-            fund['Benchmark-StDev'] = fund['Benchmark-Return'].expanding().std()
-            fund['Benchmark-Correlation'] = fund['Benchmark-Return'].expanding().corr(fund['MonthlyReturn'])
-            fund['Beta'] = fund['Benchmark-Correlation'] * (fund['StDev'] / fund['Benchmark-StDev'])
+            fund['BenchmarkReturn'] = benchmark_stats[0]['SPY']
+            fund['BenchmarkStDev'] = fund['BenchmarkReturn'].expanding().std()
+            fund['BenchmarkCorrelation'] = fund['BenchmarkReturn'].expanding().corr(fund['MonthlyReturn'])
+            fund['Beta'] = fund['BenchmarkCorrelation'] * (fund['StDev'] / fund['BenchmarkStDev'])
 
             # Downside Deviation of monthly percentage returns
             downside_deviation = fund['MonthlyReturn'][fund['MonthlyReturn'] < 0].expanding().std()
@@ -47,9 +47,9 @@ class MonthlyStatistics:
 
             fund['Skew'] = fund['MonthlyReturn'].expanding().skew(axis=0)
             fund['Kurtosis'] = fund['MonthlyReturn'].expanding().kurt(axis=0)
-            fund['Kurt_times_Skew'] = fund['Kurtosis'] * fund['Skew']
+            fund['KurtTimesSkew'] = fund['Kurtosis'] * fund['Skew']
             fund['ExcessKurtosis'] = fund['Kurtosis'] - 3
-            fund['ExcessKurtosis_times_Skew'] = fund['ExcessKurtosis'] * fund['Skew']
+            fund['ExcessKurtosisRimesSkew'] = fund['ExcessKurtosis'] * fund['Skew']
 
             # Compounded Monthly Return
             time_delta_days = (end_date - start_date).days
@@ -69,15 +69,15 @@ class MonthlyStatistics:
 
             # Markowitz Return Function
             fund['MarkowitzReturnFunction'] = fund['AvgReturn'] / fund['Variance']
-            fund['MarkowitzReturnFunction_CAGR'] = fund['CAGR'] / fund['Variance']
+            fund['MarkowitzReturnFunctionCAGR'] = fund['CAGR'] / fund['Variance']
 
-            fund['AvgReturn_StDev'] = fund['AvgReturn'] / fund['StDev']
-            fund['MedianReturn_StDev'] = fund['MedianReturn'] / fund['StDev']
-            fund['CAGR_StDev'] = fund['CAGR'] / fund['StDev']
+            fund['AvgReturnStDev'] = fund['AvgReturn'] / fund['StDev']
+            fund['MedianReturnStDev'] = fund['MedianReturn'] / fund['StDev']
+            fund['CAGRStDev'] = fund['CAGR'] / fund['StDev']
 
-            fund['AvgReturn_MaxDD'] = fund['AvgReturn'] / abs(fund['MaxDD'])
-            fund['MedianReturn_MaxDD'] = fund['MedianReturn'] / abs(fund['MaxDD'])
-            fund['CAGR_MaxDD'] = fund['CAGR'] / abs(fund['MaxDD'])
+            fund['AvgReturnMaxDD'] = fund['AvgReturn'] / abs(fund['MaxDD'])
+            fund['MedianReturnMaxDD'] = fund['MedianReturn'] / abs(fund['MaxDD'])
+            fund['CAGRMaxDD'] = fund['CAGR'] / abs(fund['MaxDD'])
 
             # # ####################################
             # # information_ratio - - need benchmark data to calculate
@@ -85,66 +85,66 @@ class MonthlyStatistics:
 
             # Treynor Ratio
             fund['TreynorRatio'] = (fund['AvgReturn'] - self.rf) / fund['Beta']
-            fund['TreynorRatio_Annualized'] = fund['TreynorRatio'] * np.sqrt(12)
+            fund['TreynorRatioAnnualized'] = fund['TreynorRatio'] * np.sqrt(12)
 
             # Sharpe Ratio
             fund['SharpeRatio'] = (fund['AvgReturn'] - self.rf) / fund['StDev']
-            fund['SharpeRatio_Annualized'] = fund['SharpeRatio'] * np.sqrt(12)
+            fund['SharpeRatioAnnualized'] = fund['SharpeRatio'] * np.sqrt(12)
 
             # Sortino Ratio
             fund['SortinoRatio'] = (fund['AvgReturn'] - self.rf) / fund['DownsideDev']
-            fund['SortinoRatio_Annualized'] = fund['SortinoRatio'] * np.sqrt(12)
+            fund['SortinoRatioAnnualized'] = fund['SortinoRatio'] * np.sqrt(12)
 
             # Calmar Ratio
             fund['CalmarRatio'] = (fund['AvgReturn'] - self.rf) / abs(fund['MaxDD'])
-            fund['CalmarRatio_Annualized'] = fund['CalmarRatio'] * np.sqrt(12)
+            fund['CalmarRatioAnnualized'] = fund['CalmarRatio'] * np.sqrt(12)
 
             # # Parametric/Gaussian VaR
             z = norm.ppf(0.05)
-            fund['Gaussian_VaR'] = -(fund['AvgReturn'] + z * fund['MonthlyReturn'].std(ddof=0))
+            fund['GaussianVaR'] = -(fund['AvgReturn'] + z * fund['MonthlyReturn'].std(ddof=0))
 
             # Modified Cornish Fisher VaR
             z = (z + (z**2 - 1) * fund['Skew'] / 6 + (z**3 - 3 * z) * (fund['Kurtosis'] - 3) / 24 - (2 * z**3 - 5 * z) * (fund['Skew']**2) / 36)
-            fund['CornishFisher_VaR'] = -(fund['AvgReturn'] + z * fund['MonthlyReturn'].std(ddof=0))
+            fund['CornishFisherVaR'] = -(fund['AvgReturn'] + z * fund['MonthlyReturn'].std(ddof=0))
 
             # Total Months
-            fund['Total_NumOfPeriods'] = fund['MonthlyReturn'].expanding().count()
+            fund['TotalNumOfPeriods'] = fund['MonthlyReturn'].expanding().count()
             
             # Winning Months
-            fund['Winning_Return'] = fund['MonthlyReturn'][fund['MonthlyReturn'] > 0]
-            fund['Winning_AvgReturn'] = fund['Winning_Return'].expanding().mean()
-            fund['Winning_MedianReturn'] = fund['Winning_Return'].expanding().median()
-            fund['Winning_MaxReturn'] = fund['Winning_Return'].expanding().max()
-            fund['Winning_MinReturn'] = fund['Winning_Return'].expanding().min()
-            fund['Winning_StDev'] = fund['Winning_Return'].expanding().std()
-            fund['Winning_Variance'] = fund['Winning_Return'].expanding().var()
-            fund['Winning_NumOfPeriods'] = fund['Winning_Return'].expanding().count()
-            fund['WinningPerc'] = fund['Winning_NumOfPeriods'] / fund['Total_NumOfPeriods']
+            fund['WinningReturn'] = fund['MonthlyReturn'][fund['MonthlyReturn'] > 0]
+            fund['WinningAvgReturn'] = fund['WinningReturn'].expanding().mean()
+            fund['WinningMedianReturn'] = fund['WinningReturn'].expanding().median()
+            fund['WinningMaxReturn'] = fund['WinningReturn'].expanding().max()
+            fund['WinningMinReturn'] = fund['WinningReturn'].expanding().min()
+            fund['WinningStDev'] = fund['WinningReturn'].expanding().std()
+            fund['WinningVariance'] = fund['WinningReturn'].expanding().var()
+            fund['WinningNumOfPeriods'] = fund['WinningReturn'].expanding().count()
+            fund['WinningPerc'] = fund['WinningNumOfPeriods'] / fund['TotalNumOfPeriods']
 
             # Losing Months
-            fund['Losing_Return'] = fund['MonthlyReturn'][fund['MonthlyReturn'] < 0]
-            fund['Losing_AvgReturn'] = fund['Losing_Return'].expanding().mean()
-            fund['Losing_MedianReturn'] = fund['Losing_Return'].expanding().median()
-            fund['Losing_MaxReturn'] = fund['Losing_Return'].expanding().max()
-            fund['Losing_MinReturn'] = fund['Losing_Return'].expanding().min()
-            fund['Losing_StDev'] = fund['Losing_Return'].expanding().std()
-            fund['Losing_Variance'] = fund['Losing_Return'].expanding().var()
-            fund['Losing_NumOfPeriods'] = fund['Losing_Return'].expanding().count()
-            fund['LosingPerc'] = fund['Losing_NumOfPeriods'] / fund['Total_NumOfPeriods']
+            fund['LosingReturn'] = fund['MonthlyReturn'][fund['MonthlyReturn'] < 0]
+            fund['LosingAvgReturn'] = fund['LosingReturn'].expanding().mean()
+            fund['LosingMedianReturn'] = fund['LosingReturn'].expanding().median()
+            fund['LosingMaxReturn'] = fund['LosingReturn'].expanding().max()
+            fund['LosingMinReturn'] = fund['LosingReturn'].expanding().min()
+            fund['LosingStDev'] = fund['LosingReturn'].expanding().std()
+            fund['LosingVariance'] = fund['LosingReturn'].expanding().var()
+            fund['LosingNumOfPeriods'] = fund['LosingReturn'].expanding().count()
+            fund['LosingPerc'] = fund['LosingNumOfPeriods'] / fund['TotalNumOfPeriods']
 
             # Win-Loss Calcs
-            fund['Win_Loss_Ratio'] = fund['Winning_NumOfPeriods'] / fund['Losing_NumOfPeriods']
-            fund['Expectancy'] = (fund['Winning_MedianReturn'] * fund['Winning_NumOfPeriods']) + (fund['Losing_MedianReturn'] * fund['Losing_NumOfPeriods'])
-            fund['ExepectancyRatio'] = (fund['Winning_MedianReturn'] * fund['Winning_NumOfPeriods']) / abs((fund['Losing_MedianReturn'] * fund['Losing_NumOfPeriods']))
+            fund['WinLossRatio'] = fund['WinningNumOfPeriods'] / fund['LosingNumOfPeriods']
+            fund['Expectancy'] = (fund['WinningMedianReturn'] * fund['WinningNumOfPeriods']) + (fund['LosingMedianReturn'] * fund['LosingNumOfPeriods'])
+            fund['ExepectancyRatio'] = (fund['WinningMedianReturn'] * fund['WinningNumOfPeriods']) / abs((fund['LosingMedianReturn'] * fund['LosingNumOfPeriods']))
             
             # Gain to Pain Ratio
-            fund['Sum_of_Returns'] = fund['MonthlyReturn'].expanding().sum()
-            fund['Sum_of_Losses'] = fund['MonthlyReturn'][fund['MonthlyReturn'] < 0].expanding().sum()
-            fund['Sum_of_Losses'].fillna(method='ffill', inplace=True)
-            fund['Gain_to_Pain_Ratio'] = fund['Sum_of_Returns'] / abs(fund['Sum_of_Losses'])
+            fund['SumOfReturns'] = fund['MonthlyReturn'].expanding().sum()
+            fund['SumOfLosses'] = fund['MonthlyReturn'][fund['MonthlyReturn'] < 0].expanding().sum()
+            fund['SumOfLosses'].fillna(method='ffill', inplace=True)
+            fund['GainToPainRatio'] = fund['SumOfReturns'] / abs(fund['SumOfLosses'])
 
             # Sharpe Ratio / Skew - average return - rf / skew
-            fund['Sharpe_Ratio_Skew'] = (fund['AvgReturn'] - self.rf) / abs(fund['Skew'])
+            fund['SharpeRatioSkew'] = (fund['AvgReturn'] - self.rf) / abs(fund['Skew'])
 
             fund_stats.append(fund)
         return fund_stats, benchmark_stats
