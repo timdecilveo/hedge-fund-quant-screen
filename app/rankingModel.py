@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from datetime import datetime
 from monthlyStatistics import MonthlyStatistics
 
 class RankingModel:
@@ -271,11 +272,19 @@ class RankingModel:
         for metric in metrics:
             features = metric.columns
             stat = metric.index
+            for feature in features:
+                feature = feature.date()
+                # print(feature)
+                # feature = feature.pd.datetime.strftime('%Y-%m-%d')
+                print(feature)
+                print('----')
+                print(type(feature))
 
 
-            # metric[f'Rank-{stat}'] = pd.qcut(metric[f'{features}'], q=quartiles, labels=False, duplicates='drop')
-            # db.append(metric)
-            print(type(features[0]))
+
+                metric[f'Rank-{stat}-{feature}'] = pd.qcut(metric[f'{feature}'], q=quartiles, labels=False, duplicates='drop')
+                db.append(metric)
+            # print(type(features[0]))
             # print('----')
             # print(ind)
             # print('----')
