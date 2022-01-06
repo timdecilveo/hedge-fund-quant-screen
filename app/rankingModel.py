@@ -227,21 +227,62 @@ class RankingModel:
 
     def ranking_model(self):
         percentiles = self.percentiles()
+        df_ranking = pd.DataFrame()
+        dict_ = {}
 
         for percentile in percentiles:
-            print(type(percentile))
+            # print(type(percentile))
             cols = percentile.columns
             for col in cols:
-                fund_strategy = re.split('\^|#', col)[2]
-            #     x = reduce(lambda x,y: pd.merge(x,y, on=fund_strategy, how='outer'), [percentile])
+                hf_strategy_name = re.split('\^|#', col)[2]
+                dict_[f'{hf_strategy_name}'] = []
+                percentile_data = percentile[col]
+
+                for key, value in dict_.items():
+                    if key == hf_strategy_name:
+                        # print(f'key: {key} -> hf: {col}')
+                        # print(f'key: {key} -> hf: {col}')
+                        # print(dict_.key)
+                        value = percentile_data
+                        print(f'hf: {hf_strategy_name}')
+                        print(f'key:\n{key}')
+                        print(f'value:\n{value}')
+                        print(f'----')
+
+
+                # if hf_strategy_name == dict_[f'{hf_strategy_name}'].key:
+                #     print(hf_strategy_name)
+                    # df_ranking[col] = percentile_data
+                # if hf_strategy_name == 'winton-capital--futures-program':
+                #     df_ranking[col] = percentile_data
+                    # dict_[f'{hf_strategy_name}'] = percentile_data
+                #     d = {name: pd.DataFrame() for name in percentile_data}
+                #     print(d)
+                    
+                # if hf_strategy_name == 'dunn-capital-management--wma-program':
+                    # df_ranking[col] = percentile_data
+
+        # print(df_ranking)
+        # print('------')
+        print(dict_)
+        print('----')
+
+
+
+
+                # if hf_strategy_name == 'winton-capital--futures-program':
+                #     x = reduce(lambda x,y: pd.merge(x,y, on=hf_strategy_name, how='outer'), [percentile])
+                #     print(x)
+                # print(hf_strategy_name)
+            #     x = reduce(lambda x,y: pd.merge(x,y, on=hf_strategy_name, how='outer'), [percentile])
             #     print(x)
             #     print('---')
-                # if fund_strategy == 'winton-capital--futures-program':
+                # if hf_strategy_name == 'winton-capital--futures-program':
                 #     print(percentile)
                 # else:
                 #     print('test')
                 # print(stat)
-                # print(fund_strategy)
+                # print(hf_strategy_name)
 
 
 
