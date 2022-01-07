@@ -11,6 +11,13 @@ class MonthlyStatistics:
         self.benchmarks = os.listdir(f"../benchmarks")
         self.benchmark_list = Directory(self.benchmarks).benchmark()
         self.rf = 0.02 / 12
+    
+    def files(self):
+        files = []
+        for fund in self.fund_list:
+            file_name = fund.columns[0]
+            files.append(file_name)
+        return files
 
     def statistics(self):
         benchmark_stats = []

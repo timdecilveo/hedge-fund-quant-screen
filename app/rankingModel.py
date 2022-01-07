@@ -227,84 +227,37 @@ class RankingModel:
 
     def ranking_model(self):
         percentiles = self.percentiles()
-        df_ranking = pd.DataFrame()
-        dict_ = {}
+
+        # percentiles.to_csv("percentiles.csv")
+        files = MonthlyStatistics().files()
+        ranking_df = pd.DataFrame()
+        rank = []
+        objs = [
+            'dunn-capital-management--wma-program',
+            'eckhardt-trading-company--evolution-strategy',
+            'mak-capital--one-fund',
+            'tim--trend-2',
+            'winton-capital--futures-program',
+        ]
 
         for percentile in percentiles:
-            # print(type(percentile))
             cols = percentile.columns
-            for col in cols:
+            for (col, file) in zip(cols, files):
                 hf_strategy_name = re.split('\^|#', col)[2]
-                dict_[f'{hf_strategy_name}'] = []
-                percentile_data = percentile[col]
+                # if hf_strategy_name == file:
+                # if hf_strategy_name == objs[0]:
+                #     ranking_df[f'{col}'] = percentile[col]
+                # if hf_strategy_name == objs[1]:
+                #     ranking_df[f'{col}'] = percentile[col]
+                # if hf_strategy_name == objs[2]:
+                #     ranking_df[f'{col}'] = percentile[col]
+                if hf_strategy_name == file:
+                    ranking_df[f'{col}'] = percentile[col]
+                # if hf_strategy_name == objs[4]:
+                #     ranking_df[f'{col}'] = percentile[col]
 
-                for key, value in dict_.items():
-                    if key == hf_strategy_name:
-                        # print(f'key: {key} -> hf: {col}')
-                        # print(f'key: {key} -> hf: {col}')
-                        # print(dict_.key)
-                        value = percentile_data
-                        print(f'hf: {hf_strategy_name}')
-                        print(f'key:\n{key}')
-                        print(f'value:\n{value}')
-                        print(f'----')
-
-
-                # if hf_strategy_name == dict_[f'{hf_strategy_name}'].key:
-                #     print(hf_strategy_name)
-                    # df_ranking[col] = percentile_data
-                # if hf_strategy_name == 'winton-capital--futures-program':
-                #     df_ranking[col] = percentile_data
-                    # dict_[f'{hf_strategy_name}'] = percentile_data
-                #     d = {name: pd.DataFrame() for name in percentile_data}
-                #     print(d)
-                    
-                # if hf_strategy_name == 'dunn-capital-management--wma-program':
-                    # df_ranking[col] = percentile_data
-
-        # print(df_ranking)
-        # print('------')
-        print(dict_)
-        print('----')
+        ranking_df['sum'] = ranking_df.sum(axis=1)
+        print(ranking_df['sum'])
 
 
-
-
-                # if hf_strategy_name == 'winton-capital--futures-program':
-                #     x = reduce(lambda x,y: pd.merge(x,y, on=hf_strategy_name, how='outer'), [percentile])
-                #     print(x)
-                # print(hf_strategy_name)
-            #     x = reduce(lambda x,y: pd.merge(x,y, on=hf_strategy_name, how='outer'), [percentile])
-            #     print(x)
-            #     print('---')
-                # if hf_strategy_name == 'winton-capital--futures-program':
-                #     print(percentile)
-                # else:
-                #     print('test')
-                # print(stat)
-                # print(hf_strategy_name)
-
-
-
-
-
-
-        # rankings = pd.DataFrame()
-        # test = []
-
-        # for percentile in percentiles:
-        #     features = percentile.columns
-        #     for feature in features:
-        #         rankings[f'{feature}'] = percentile[f'{feature}']
-
-
-        # rankings['sum'] = rankings.sum(axis=1)
-        # print(rankings)
-        # rankings['rank'] = rankings.sum()
-        # for ranking in rankings:
-        #     ranking['Rank'] = ranking.sum()
-        #     test.append(ranking)
-        # print(test)
-
-
-    
+        ranking_df.to_csv("ranking_df.csv")
