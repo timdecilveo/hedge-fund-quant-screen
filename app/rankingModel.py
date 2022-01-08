@@ -230,7 +230,8 @@ class RankingModel:
 
         # percentiles.to_csv("percentiles.csv")
         files = MonthlyStatistics().files()
-        ranking_df = pd.DataFrame()
+        df_ranking = pd.DataFrame()
+        dict_test = {}
         rank = []
         objs = [
             'dunn-capital-management--wma-program',
@@ -242,22 +243,44 @@ class RankingModel:
 
         for percentile in percentiles:
             cols = percentile.columns
-            for (col, file) in zip(cols, files):
-                hf_strategy_name = re.split('\^|#', col)[2]
-                # if hf_strategy_name == file:
-                # if hf_strategy_name == objs[0]:
-                #     ranking_df[f'{col}'] = percentile[col]
-                # if hf_strategy_name == objs[1]:
-                #     ranking_df[f'{col}'] = percentile[col]
-                # if hf_strategy_name == objs[2]:
-                #     ranking_df[f'{col}'] = percentile[col]
-                if hf_strategy_name == file:
-                    ranking_df[f'{col}'] = percentile[col]
-                # if hf_strategy_name == objs[4]:
-                #     ranking_df[f'{col}'] = percentile[col]
-
-        ranking_df['sum'] = ranking_df.sum(axis=1)
-        print(ranking_df['sum'])
+            for col in cols:
+                strategy_names = re.split('\^|#', col)[2]
+                df_ranking[f'{col}'] = percentile[col]
+                # df_ranking[f'sum-{strategy_names}'] = df_ranking.groupby(f'{strategy_names}').sum()
+        
+        for (col, file) in zip(df_ranking.columns, files):
+            strategy_names = re.split('\^|#', col)[2]
+            # print(f'col: {col} -> strategy_names: {strategy_names}')
+            # df_ranking[f'sum-{strategy_names}'] = df_ranking.groupby([f'{strategy_names}']).sum()
+            df_ranking = df_ranking.groupby(by=f'{strategy_names}', axis=1).sum()
+        print(df_ranking)
+        print('-----')
+        # print(df_ranking[''])
+        # print('-----')
 
 
-        ranking_df.to_csv("ranking_df.csv")
+
+        # #####################################################
+        # print(df_ranking)
+        # print(df_ranking.columns)
+
+            # for (col, file) in zip(cols, files):
+                # strategy_names = re.split('\^|#', col)[2]
+                # if strategy_names == file:
+                # if strategy_names == objs[0]:
+                #     df_ranking[f'{col}'] = percentile[col]
+                # if strategy_names == objs[1]:
+                #     df_ranking[f'{col}'] = percentile[col]
+                # if strategy_names == objs[2]:
+                #     df_ranking[f'{col}'] = percentile[col]
+                # if strategy_names == objs[3]:
+                    # df_ranking[f'{col}'] = percentile[col]
+                # if strategy_names == objs[4]:
+                #     df_ranking[f'{col}'] = percentile[col]
+
+        # df_ranking['sum'] = df_ranking.sum(axis=1)
+        # strategy_names = re.split('\^|#', col)[2]
+        # test = sum(i for i in percentile[col] if strategy_names == objs[4])
+        # df_ranking[f'sum-{strategy_names}'] = test
+
+        # ranking_df.to_csv("ranking_df.csv")
