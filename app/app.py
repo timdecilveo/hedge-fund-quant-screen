@@ -14,6 +14,7 @@ from rankingModel import RankingModel
 # print(df_ranking)
 ############################################################################
 d = '2019-02-28'
-df_ranking = RankingModel().ranking_as_of(date=d)
+df_ranking = RankingModel().ranking_as_of()
+# df_ranking = RankingModel().ranking_as_of(date=d)
 print(df_ranking)
 ############################################################################
