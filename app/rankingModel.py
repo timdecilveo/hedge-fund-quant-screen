@@ -254,8 +254,8 @@ class RankingModel:
 
         try:
             if date == -1:
-                return df_ranking.iloc[date]
+                return df_ranking.iloc[date].sort_values(ascending=False)
             elif datetime.strptime(date, format):
-                return df_ranking.loc[date]
+                return df_ranking.loc[date].sort_values(ascending=False)
         except ValueError:
             print('This is the incorrect date string format. The correct format is YYYY-MM-DD.')
