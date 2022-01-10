@@ -226,16 +226,36 @@ class RankingModel:
         return percentiles
 
     def ranking_model(self):
+        '''
+        Sum the different columns by date to get time-series of rankings
+        '''
         percentiles = self.percentiles()
         files = MonthlyStatistics().files()
+        df_all_stats = pd.DataFrame()
         df_ranking = pd.DataFrame()
 
         for percentile in percentiles:
             cols = percentile.columns
             for col in cols:
-                df_ranking[f'{col}'] = percentile[col]
+                df_all_stats[f'{col}'] = percentile[col]
+        N = len(df_all_stats.columns)
 
         for file in files:
-            df_ranking[f'sum-{file}'] = df_ranking[[fund_name for fund_name in df_ranking.columns if fund_name.endswith(f'{file}')]].sum(axis=1)
-        
-        return df_ranking
+            df_all_stats[f'sum-{file}'] = df_all_stats[[fund_name for fund_name in df_all_stats.columns if fund_name.endswith(f'{file}')]].sum(axis=1)
+        N = len(df_all_stats.columns) - N
+
+        df_ranking = df_all_stats.iloc[:, -N:]
+
+        return df_all_stats, df_ranking
+    
+    def ranking_as_of(self, date=-1):
+        df_all_stats, df_ranking = self.ranking_model()
+        format = '%Y-%m-%d'
+
+        try:
+            if date == -1:
+                return df_ranking.iloc[date]
+            elif datetime.strptime(date, format):
+                return df_ranking.loc[date]
+        except ValueError:
+            print('This is the incorrect date string format. The correct format is YYYY-MM-DD.')
