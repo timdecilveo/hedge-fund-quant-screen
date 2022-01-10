@@ -9,9 +9,9 @@ from rankingModel import RankingModel
 # print(fund_statistics)
 # print(benchmark_statistics)
 ############################################################################
-# df_all_stats, df_ranking = RankingModel().ranking_model()
+# df_all_stats, df_ranking_sum = RankingModel().ranking_model()
 # print(df_all_stats)
-# print(df_ranking)
+# print(df_ranking_sum)
 ############################################################################
 d = '2019-02-28'
 # df_ranking = RankingModel().ranking_as_of(date=d)

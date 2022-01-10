@@ -232,30 +232,29 @@ class RankingModel:
         percentiles = self.percentiles()
         files = MonthlyStatistics().files()
         df_all_stats = pd.DataFrame()
-        df_ranking = pd.DataFrame()
+        df_ranking_sum = pd.DataFrame()
+        df_ranking_median = pd.DataFrame()
 
         for percentile in percentiles:
             cols = percentile.columns
             for col in cols:
                 df_all_stats[f'{col}'] = percentile[col]
-        N = len(df_all_stats.columns)
 
         for file in files:
-            df_all_stats[f'sum-{file}'] = df_all_stats[[fund_name for fund_name in df_all_stats.columns if fund_name.endswith(f'{file}')]].sum(axis=1)
-        N = len(df_all_stats.columns) - N
+            df_ranking_sum[f'sum-{file}'] = df_all_stats[[fund_name for fund_name in df_all_stats.columns if fund_name.endswith(f'{file}')]].sum(axis=1)
+            # df_ranking_median[f'median-{file}'] = df_all_stats[[fund_name for fund_name in df_all_stats.columns if fund_name.endswith(f'{file}')]].expanding().median()
 
-        df_ranking = df_all_stats.iloc[:, -N:]
-
-        return df_all_stats, df_ranking
+        return df_all_stats, df_ranking_sum
+        # return df_all_stats, df_ranking_sum, df_ranking_median
     
     def ranking_as_of(self, date=-1):
-        df_all_stats, df_ranking = self.ranking_model()
+        df_all_stats, df_ranking_sum = self.ranking_model()
         format = '%Y-%m-%d'
 
         try:
             if date == -1:
-                return df_ranking.iloc[date].sort_values(ascending=False)
+                return df_ranking_sum.iloc[date].sort_values(ascending=False)
             elif datetime.strptime(date, format):
-                return df_ranking.loc[date].sort_values(ascending=False)
+                return df_ranking_sum.loc[date].sort_values(ascending=False)
         except ValueError:
             print('This is the incorrect date string format. The correct format is YYYY-MM-DD.')
