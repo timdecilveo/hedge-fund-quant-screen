@@ -10,4 +10,5 @@ fund_statistics, benchmark_statistics = MonthlyStatistics().statistics()
 # print(benchmark_statistics)
 ############################################################################
 
-print(RankingModel().ranking_model())
+df_ranking = RankingModel().ranking_model()
+print(df_ranking)
