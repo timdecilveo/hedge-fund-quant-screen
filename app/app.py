@@ -13,7 +13,10 @@ from rankingModel import RankingModel
 # print(df_all_stats)
 # print(df_ranking_sum)
 ############################################################################
+
+
+
 d = '2019-02-28'
 # df_ranking = RankingModel().ranking_as_of(date=d)
-df_ranking = RankingModel().ranking_as_of()
+df_ranking = RankingModel().ranking_as_of(d)
 print(df_ranking)
